@@ -1,0 +1,20 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs
+/IMGCloud/IMGCloud.Data/obj
+/IMGCloud/IMGCloud.Data/bin
+/IMGCloud/IMGCloud.API/obj
+/IMGCloud/IMGCloud.API/bin
+/IMGCloud/IMGCloud.Application/obj
+/IMGCloud/IMGCloud.Application/bin
+/IMGCloud/IMGCloud.Data/obj
+/IMGCloud/IMGCloud.Data/bin
+/IMGCloud/IMGCloud.Domain/obj
+/IMGCloud/IMGCloud.Domain/bin
+/IMGCloud/IMGCloud.UnitTest/obj
+/IMGCloud/IMGCloud.UnitTest/bin
+/IMGCloud/IMGCloud.Utilities/obj
+/IMGCloud/IMGCloud.Utilities/bin
+/IMGCloud/.vs
