@@ -4,8 +4,8 @@ namespace IMGCloud.Application.Interfaces.Auth
 {
     public interface IAuthenticationService
     {
-        Task<ResponeVM> SignUpAsync(SignUpVM model);
-        Task<TokenResult> SignInAsync(SigInVM model);
+        Task<ResponeVM> SignUpAsync(CreateUserVM model);
+        Task<ResponeAuthVM> SignInAsync(SigInVM model);
         Task<TokenResult> RefreshTokenAsync(string refreshToken, string accessToken = null);
         Task SignOutAsync();
     }

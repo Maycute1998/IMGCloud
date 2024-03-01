@@ -12,11 +12,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="ViewModels\" />
+    <ProjectReference Include="..\IMGCloud.Application\IMGCloud.Application.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\IMGCloud.Application\IMGCloud.Application.csproj" />
+    <Folder Include="wwwroot\" />
   </ItemGroup>
 
 </Project>

@@ -5,7 +5,7 @@ namespace IMGCloud.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class Post : ControllerBase
+    public class Post : BaseController
     {
     }
 }

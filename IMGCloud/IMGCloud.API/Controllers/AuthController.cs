@@ -3,17 +3,18 @@ using IMGCloud.Domain.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
-using System.Xml.Linq;
+using IMGCloud.API.ViewModels;
+using IMGCloud.Application.Interfaces.Auth;
 
 namespace IMGCloud.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AuthController : ControllerBase
+    public class AuthController : BaseController
     {
-        private readonly AuthenticationService _authService;
+        private readonly IAuthenticationService _authService;
 
-        public AuthController(AuthenticationService authService)
+        public AuthController(IAuthenticationService authService)
         {
             _authService = authService;
         }
@@ -40,41 +41,6 @@ namespace IMGCloud.API.Controllers
             return ExecuteResult(data.Status, data.Message);
         }
 
-
-        public virtual IActionResult ExecuteResult<TOption>(TOption option)
-        {
-            return new ObjectResult(option);
-        }
-
-        public virtual IActionResult ExecuteResult(bool Status, string Message)
-        {
-            var Result = new BaseOptions();
-            try
-            {
-                if (Status)
-                {
-                    Result.Data = null;
-                    Result.Status = Status;
-                    Result.Message = Message;
-                    Result.StatusCode = HttpStatusCode.OK;
-                }
-                else
-                {
-                    Result.Data = null;
-                    Result.Status = Status;
-                    Result.Message = Message;
-                    Result.StatusCode = HttpStatusCode.InternalServerError;
-                }
-                return new ObjectResult(Result);
-            }
-            catch (Exception ex)
-            {
-                Result.Data = null;
-                Result.Status = false;
-                Result.Message = string.Concat("Bad request", ex.Message);
-                Result.StatusCode = HttpStatusCode.BadRequest;
-                return BadRequest(Result);
-            }
-        }
+        
     }
 }

@@ -55,6 +55,13 @@ namespace IMGCloud.Domain.Repositories.Implement
             return result;
         }
 
+        public T GetId(Expression<Func<T, bool>> predicate)
+        {
+            IQueryable<T> query = _dbSet;
+            if (predicate != null) query = query.Where(predicate);
+            return query.FirstOrDefault();
+        }
+
         public async Task<T> GetSingleAsync(Expression<Func<T, bool>> predicate = null,
            Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null,
            Func<IQueryable<T>, IIncludableQueryable<T, object>> include = null,
