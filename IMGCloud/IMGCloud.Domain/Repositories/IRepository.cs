@@ -7,6 +7,7 @@ namespace IMGCloud.Domain.Repositories
     {
         Task<List<T>> GetAll();
         Task<T> GetById(int id);
+        T GetId(Expression<Func<T, bool>> predicate);
         Task<T> GetSingleAsync(Expression<Func<T, bool>> predicate = null,
            Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null,
            Func<IQueryable<T>, IIncludableQueryable<T, object>> include = null,
