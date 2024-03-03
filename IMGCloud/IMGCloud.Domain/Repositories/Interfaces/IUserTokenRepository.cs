@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IMGCloud.Domain.Repositories.Implement
+namespace IMGCloud.Domain.Repositories.Interfaces
 {
     public interface IUserTokenRepository
     {

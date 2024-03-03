@@ -2,7 +2,7 @@
 using IMGCloud.Domain.Models;
 using IMGCloud.Domain.Repositories.Implement;
 
-namespace IMGCloud.Domain.Repositories
+namespace IMGCloud.Domain.Repositories.Interfaces
 {
     public interface IUserRepository
     {

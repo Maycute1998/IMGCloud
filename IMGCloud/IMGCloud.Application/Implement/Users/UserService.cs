@@ -4,9 +4,8 @@ using IMGCloud.Application.Interfaces.Users;
 using IMGCloud.Domain.Models;
 using IMGCloud.Utilities.PasswordHashExtension;
 using IMGCloud.Data.Entities;
-using IMGCloud.Domain.Repositories.Implement;
-using IMGCloud.Domain.Repositories;
 using Microsoft.AspNetCore.Http;
+using IMGCloud.Domain.Repositories.Interfaces;
 
 namespace IMGCloud.Application.Implement.Users
 {

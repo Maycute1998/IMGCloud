@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore.Query;
 using System.Linq.Expressions;
 
-namespace IMGCloud.Domain.Repositories
+namespace IMGCloud.Domain.Repositories.Interfaces
 {
     public interface IRepository<T> where T : class
     {

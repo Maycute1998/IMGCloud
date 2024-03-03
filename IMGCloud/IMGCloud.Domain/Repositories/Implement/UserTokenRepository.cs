@@ -2,7 +2,7 @@
 using IMGCloud.Data.Entities;
 using IMGCloud.Data.Enums;
 using IMGCloud.Domain.Models;
-using IMGCloud.Domain.Repositories.Implement;
+using IMGCloud.Domain.Repositories.Interfaces;
 using IMGCloud.Utilities.AutoMapper;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
@@ -13,7 +13,7 @@ using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IMGCloud.Domain.Repositories
+namespace IMGCloud.Domain.Repositories.Implement
 {
     public class UserTokenRepository : Repository<UserToken>, IUserTokenRepository
     {
@@ -36,7 +36,7 @@ namespace IMGCloud.Domain.Repositories
             var userToken = _context.UserTokens.SingleOrDefault(x => x.UserId == userId);
             if (userToken is not null)
             {
-                return userToken.Token; 
+                return userToken.Token;
             }
             return string.Empty;
         }

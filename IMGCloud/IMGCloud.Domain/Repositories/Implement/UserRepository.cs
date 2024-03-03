@@ -9,6 +9,7 @@ using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using System.Linq.Expressions;
 using System;
+using IMGCloud.Domain.Repositories.Interfaces;
 
 namespace IMGCloud.Domain.Repositories.Implement
 {
@@ -18,7 +19,6 @@ namespace IMGCloud.Domain.Repositories.Implement
         private readonly ILogger<UserRepository> _logger;
         private readonly IStringLocalizer<UserRepository> _stringLocalizer;
         private readonly string className = typeof(UserRepository).FullName ?? string.Empty;
-
 
         public UserRepository(ILogger<UserRepository> logger,
             IMGCloudContext context,

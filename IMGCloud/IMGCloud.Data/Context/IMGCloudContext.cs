@@ -26,7 +26,7 @@ namespace IMGCloud.Data.Context
             modelBuilder.ApplyConfiguration(new UserTokenConfiguration());
             modelBuilder.ApplyConfiguration(new UserInfoConfiguration());
             modelBuilder.ApplyConfiguration(new PostConfiguration());
-            modelBuilder.ApplyConfiguration(new PostCollectionConfiguration());
+            modelBuilder.ApplyConfiguration(new CollectionConfiguration());
             modelBuilder.ApplyConfiguration(new CommentConfiguration());
             modelBuilder.ApplyConfiguration(new PostImageConfiguration());
         }

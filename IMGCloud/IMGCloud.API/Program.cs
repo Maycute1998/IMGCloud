@@ -1,22 +1,14 @@
-using IMGCloud.Application.Implement.Auth;
-using IMGCloud.Application.Implement.Users;
-using IMGCloud.Application.Interfaces.Auth;
 using Microsoft.Extensions.Localization;
 using Microsoft.OpenApi.Models;
 using IMGCloud.Utilities.Languages;
 using Microsoft.AspNetCore.Localization;
-using Microsoft.Extensions.Configuration;
 using System.Globalization;
-using IMGCloud.Domain.Repositories.Implement;
 using IMGCloud.Data.Context;
 using Microsoft.EntityFrameworkCore;
-using IMGCloud.Application.Interfaces.Users;
-using IMGCloud.Application.Interfaces.Cache;
-using IMGCloud.Application.Implement.Cache;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using IMGCloud.Domain.Repositories;
+using IMGCloud.Application.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -29,15 +21,11 @@ builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSingleton<IStringLocalizerFactory, JsonStringLocalizerFactory>();
 #endregion
 
+builder.Services.AddRepositoryApplication();
 builder.Services.AddControllers();
 builder.Services.AddDbContext<IMGCloudContext>(options => options.UseSqlServer(configuration.GetConnectionString("DefaultConnectString")));
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-
-builder.Services.AddScoped<ICacheService, CacheService>();
-builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IUserTokenRepository, UserTokenRepository>();
+builder.Services.AddServiceApplication();
 
 #region JWT Config
 builder.Services.AddAuthentication(opt =>
