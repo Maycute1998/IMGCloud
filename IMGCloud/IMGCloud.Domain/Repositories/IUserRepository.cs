@@ -8,8 +8,9 @@ namespace IMGCloud.Domain.Repositories
     {
         Task<bool> IsExitsUserNameAsync(string userName);
         Task<bool> IsExitsUserEmailAsync(string email);
-        Task<ResponeVM> CreateUserAsync(CreateUserVM model);
+        Task<ResponeVM> CreateUserAsync(UserVM model);
         Task<bool> IsActiveUserAsync(string userName);
         int GetUserId(string userName);
+        Task<User> GetUserbyUserName(string userName);
     }
 }

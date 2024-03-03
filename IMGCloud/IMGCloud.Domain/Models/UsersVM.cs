@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace IMGCloud.Domain.Models
 {
-    public class CreateUserVM
+    public class UserVM
     {
         [Required(ErrorMessage = "userNameRequired")]
         [StringLength(255, ErrorMessage = "userNameLimitStringLength")]

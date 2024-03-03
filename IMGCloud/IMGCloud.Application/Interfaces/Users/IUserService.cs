@@ -6,6 +6,10 @@ namespace IMGCloud.Application.Interfaces.Users
     {
         int GetUserId(string userName);
         Task<ResponeVM> IsActiveUserAsync(SigInVM user);
-        Task<ResponeVM> CreateUserAsync(CreateUserVM model);
+        Task<ResponeVM> CreateUserAsync(UserVM model);
+        string GetExistedTokenFromDatabase(int userId);
+        ResponeVM StoreTokenAsync(TokenVM tokenModel);
+        ResponeVM RemveToken();
+
     }
 }

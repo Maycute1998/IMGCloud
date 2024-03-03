@@ -9,6 +9,8 @@ namespace IMGCloud.Domain.Repositories.Implement
 {
     public interface IUserTokenRepository
     {
-        Task <ResponeVM> StoreTokenAsync(TokenVM tokenModel);
+        string GetExistedUserTokenFromDB(int userId);
+        ResponeVM StoreToken(TokenVM tokenModel);
+        ResponeVM RemveToken(int userId);
     }
 }

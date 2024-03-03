@@ -1,11 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace IMGCloud.Domain.Repositories.Implement
 {
@@ -19,24 +14,24 @@ namespace IMGCloud.Domain.Repositories.Implement
             _dbContext = context ?? throw new ArgumentException(nameof(context));
             _dbSet = _dbContext.Set<T>();
         }
-        public async Task Add(T entity)
+        public void Add(T entity)
         {
             if (entity == null)
             {
                 throw new ArgumentNullException("entity");
             }
-            await _dbSet.AddAsync(entity);
-            await _dbContext.SaveChangesAsync();
+            _dbSet.Add(entity);
+            _dbContext.SaveChanges();
         }
 
         public Task AddRange(IEnumerable<T> entities)
         {
             throw new NotImplementedException();
         }
-        public async Task Delete(T entity)
+        public void Delete(T entity)
         {
             _dbSet.Remove(entity);
-            await _dbContext.SaveChangesAsync();
+            _dbContext.SaveChanges();
         }
 
         public async Task<List<T>> GetAll()
@@ -44,9 +39,9 @@ namespace IMGCloud.Domain.Repositories.Implement
             return await _dbSet!.ToListAsync();
         }
 
-        public async Task<T> GetById(int id)
+        public T GetById(int id)
         {
-            var result = await _dbSet.FindAsync(id);
+            var result = _dbSet.Find(id);
             if (result == null)
             {
                 throw new ArgumentNullException("Id null");
@@ -79,24 +74,24 @@ namespace IMGCloud.Domain.Repositories.Implement
             return await query.FirstOrDefaultAsync();
         }
 
-        public async Task Remove(T entity)
+        public void Remove(T entity)
         {
             if (entity == null)
             {
                 throw new ArgumentNullException("entity");
             }
             _dbSet.Update(entity);
-            await _dbContext.SaveChangesAsync();
+            _dbContext.SaveChanges();
         }
 
-        public async Task Update(T entity)
+        public void Update(T entity)
         {
             if (entity == null)
             {
                 throw new ArgumentNullException("entity");
             }
             _dbSet.Update(entity);
-            await _dbContext.SaveChangesAsync();
+            _dbContext.SaveChanges();
         }
     }
 }

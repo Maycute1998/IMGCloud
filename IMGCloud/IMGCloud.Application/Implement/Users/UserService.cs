@@ -6,6 +6,7 @@ using IMGCloud.Utilities.PasswordHashExtension;
 using IMGCloud.Data.Entities;
 using IMGCloud.Domain.Repositories.Implement;
 using IMGCloud.Domain.Repositories;
+using Microsoft.AspNetCore.Http;
 
 namespace IMGCloud.Application.Implement.Users
 {
@@ -14,15 +15,22 @@ namespace IMGCloud.Application.Implement.Users
         private readonly IStringLocalizer<UserService> _stringLocalizer;
         private readonly ILogger<UserService> _logger;
         private readonly IUserRepository _userRepository;
+        private readonly IUserTokenRepository _userTokenRepository;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
         public UserService(ILogger<UserService> logger,
             IStringLocalizer<UserService> stringLocalizer,
-            IUserRepository userRepository)
+            IUserRepository userRepository,
+            IUserTokenRepository userTokenRepository,
+            IHttpContextAccessor httpContextAccessor)
         {
             _logger = logger;
             _stringLocalizer = stringLocalizer;
             _userRepository = userRepository;
+            _userTokenRepository = userTokenRepository;
+            _httpContextAccessor = httpContextAccessor;
         }
-        public async Task<ResponeVM> CreateUserAsync(CreateUserVM model)
+        public async Task<ResponeVM> CreateUserAsync(UserVM model)
         {
             var res = new ResponeVM();
             try
@@ -54,12 +62,12 @@ namespace IMGCloud.Application.Implement.Users
         public async Task<ResponeVM> IsActiveUserAsync(SigInVM model)
         {
             var result = new ResponeVM();
-            var activeUser = await _userRepository.IsActiveUserAsync(model.UserName);
+            var activeUser = await _userRepository.GetUserbyUserName(model.UserName);
             try
             {
-                if (activeUser)
+                if (activeUser is not null)
                 {
-                    var isValidPassword = model.Password.VerifyPassword(model.Password);
+                    var isValidPassword = model.Password.VerifyPassword(activeUser.Password);
                     if (isValidPassword)
                     {
                         result.Status = true;
@@ -84,6 +92,33 @@ namespace IMGCloud.Application.Implement.Users
         public int GetUserId(string userName)
         {
             return _userRepository.GetUserId(userName);
+        }
+
+        public string GetExistedTokenFromDatabase(int userId)
+        {
+            return _userTokenRepository.GetExistedUserTokenFromDB(userId);
+        }
+
+        public ResponeVM StoreTokenAsync(TokenVM tokenModel)
+        {
+            return _userTokenRepository.StoreToken(tokenModel);
+        }
+
+        public string GetCurrentUserName
+        {
+            get
+            {
+                if (_httpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
+                {
+                    return _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault().Subject.Name;
+                }
+                return "Please login";
+            }
+        }
+        public ResponeVM RemveToken()
+        {
+            var curentUserId = _userRepository.GetUserId(GetCurrentUserName);
+            return _userTokenRepository.RemveToken(curentUserId);
         }
     }
 }

@@ -35,7 +35,7 @@ namespace IMGCloud.API.Controllers
 
         [HttpPost]
         [Route("register")]
-        public async Task<IActionResult> RegisterAsync([FromForm] CreateUserVM model)
+        public async Task<IActionResult> RegisterAsync([FromForm] UserVM model)
         {
             var data = await _authService.SignUpAsync(model);
             return ExecuteResult(data.Status, data.Message);

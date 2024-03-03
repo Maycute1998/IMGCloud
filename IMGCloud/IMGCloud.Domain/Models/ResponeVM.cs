@@ -38,10 +38,17 @@ namespace IMGCloud.Domain.Models
 
     public class TokenVM
     {
-        public int? UserId { get; set; }
+        public int UserId { get; set; }
         public string? UserName { get; set; }
         public string? Token { get; set; }
-        public DateTime? ExpireDays { get; set; }
+        public DateTime? ExpireDate { get; set; }
         public bool IsActive { get; set; }
+    }
+
+    public class RedisAuthenticationVM
+    {
+        public string? RedisKey { get; set; }
+        public string? Token { get; set; }
+        public DateTime? ExpireDate { get; set; }
     }
 }

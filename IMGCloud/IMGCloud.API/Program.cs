@@ -16,6 +16,7 @@ using IMGCloud.Application.Implement.Cache;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using IMGCloud.Domain.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -30,28 +31,37 @@ builder.Services.AddSingleton<IStringLocalizerFactory, JsonStringLocalizerFactor
 
 builder.Services.AddControllers();
 builder.Services.AddDbContext<IMGCloudContext>(options => options.UseSqlServer(configuration.GetConnectionString("DefaultConnectString")));
+builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
 builder.Services.AddScoped<ICacheService, CacheService>();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IUserTokenRepository, UserTokenRepository>();
 
 #region JWT Config
 builder.Services.AddAuthentication(opt =>
 {
     opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    opt.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+    opt.DefaultChallengeScheme  = JwtBearerDefaults.AuthenticationScheme;
+    //opt.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
 }).AddJwtBearer(opt =>
 {
-    opt.SaveToken = true;
-    opt.RequireHttpsMetadata = false;
-    opt.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+    //opt.SaveToken = true;
+    //opt.RequireHttpsMetadata = false;
+    opt.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
         ValidateAudience = true,
-        ValidAudience = builder.Configuration["JWT:ValidAudience"],
-        ValidIssuer = builder.Configuration["JWT:ValidIssuer"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:SecretKey"]))
+        ValidateLifetime = true,//Set Expiry
+        ValidateIssuerSigningKey = true,
+        SaveSigninToken = true,
+        ClockSkew = TimeSpan.Zero,
+
+
+        ValidIssuer = configuration["TokenConfigs:Issuer"],
+        ValidAudience = configuration["TokenConfigs:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["TokenConfigs:SecurityKey"]))
     };
 });
 #endregion
@@ -118,10 +128,8 @@ app.UseSwaggerUI(c =>
 {
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "IMGCloud.API");
 });
-
-
 app.UseHttpsRedirection();
-
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

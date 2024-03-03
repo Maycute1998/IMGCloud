@@ -28,14 +28,14 @@ namespace IMGCloud.Domain.Repositories.Implement
             _context = context;
             _stringLocalizer = stringLocalizer;
         }
-        public async Task<ResponeVM> CreateUserAsync(CreateUserVM model)
+        public async Task<ResponeVM> CreateUserAsync(UserVM model)
         {
             var res = new ResponeVM();
             try
             {
                 model.Password = model.Password.ToHashPassword();
 
-                var user = new Data.Entities.User().MapFor(model);
+                var user = new User().MapFor(model);
                 user.CreatedDate = DateTime.Now;
                 user.ModifiedDate = DateTime.Now;
                 user.Status = Status.Active;
@@ -73,6 +73,11 @@ namespace IMGCloud.Domain.Repositories.Implement
         public int GetUserId(string userName)
         {
             return GetId(x => x.UserName == userName)?.Id ?? 0;
+        }
+
+        public async Task<User> GetUserbyUserName(string userName)
+        {
+            return await GetSingleAsync(x => x.UserName.ToLower() == userName.ToLower() && x.Status == Status.Active);
         }
     }
 }
