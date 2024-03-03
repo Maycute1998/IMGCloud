@@ -41,6 +41,7 @@ namespace IMGCloud.Domain.Repositories.Implement
                 user.Status = Status.Active;
                 _context.Users.Add(user);
                 await _context.SaveChangesAsync();
+
                 res.Status = true;
                 res.Message = _stringLocalizer["createSuccess"].ToString();
             }
