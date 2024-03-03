@@ -11,7 +11,7 @@ namespace IMGCloud.Data.Entities
         public PostPrivacy PostPrivacy { get; set; }
         public int? Heart { get; set; }
         public User? Users { get; set; }
-        public PostCollection PostCollections { get; set; } 
+        public Collection? Collection { get; set; } 
         public ICollection<PostImage>? PostImages { get; set; } = new List<PostImage>();
         public ICollection<Comment>? Comments { get; set; } = new List<Comment>(); // List<Comment> PostTags { get; set; }
     }

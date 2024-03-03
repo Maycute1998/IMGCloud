@@ -9,19 +9,19 @@ using System.Threading.Tasks;
 
 namespace IMGCloud.Data.EntityConfigurations
 {
-    public class PostCollectionConfiguration : IEntityTypeConfiguration<PostCollection>
+    public class CollectionConfiguration : IEntityTypeConfiguration<Collection>
     {
 
-        public void Configure(EntityTypeBuilder<PostCollection> builder)
+        public void Configure(EntityTypeBuilder<Collection> builder)
         {
-            builder.ToTable("PostCollections");
+            builder.ToTable("Collections");
             builder.HasKey(x => x.Id);
             builder.Property(x => x.Id).UseIdentityColumn();
             builder.Property(x => x.CollectionName).HasColumnType("nvarchar(100)");
 
 
             builder.HasMany(x => x.Posts)
-                .WithOne(x => x.PostCollections)
+                .WithOne(x => x.Collection)
                 .HasForeignKey(x => x.CollectionId)
                 .IsRequired(false); ;
         }

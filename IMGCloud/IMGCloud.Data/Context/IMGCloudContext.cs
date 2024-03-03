@@ -32,7 +32,7 @@ namespace IMGCloud.Data.Context
         }
 
         public DbSet<Post> Posts { get; set; }
-        public DbSet<PostCollection> PostCollections { get; set; }
+        public DbSet<Collection> Collections { get; set; }
         public DbSet<Comment> Comments { get; set; }
         public DbSet<PostImage> PostImages { get; set; }
         public DbSet<UserToken> UserTokens { get; set; }
