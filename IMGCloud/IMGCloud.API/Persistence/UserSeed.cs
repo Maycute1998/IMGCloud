@@ -40,6 +40,10 @@ public static class UserSeed
         if (user is null)
         {
             var result = repository.CreateUserAsync(userInfo!.ToUserVM()).Result;
+            if (result is null || !result.Status)
+            {
+                Console.WriteLine("Seed user is failed!!!");
+            }
         }
 
     }
