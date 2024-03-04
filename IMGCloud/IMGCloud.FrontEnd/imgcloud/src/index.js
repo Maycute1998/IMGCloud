@@ -4,8 +4,7 @@ import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import SignUp from "./containers/auth/signup";
-import SignIn from "./containers/auth/signin";
+import Welcome from "./containers/welcome";
 
 const router = createBrowserRouter([
   {
@@ -13,12 +12,8 @@ const router = createBrowserRouter([
     element: <App />,
   },
   {
-    path: "signin",
-    element: <SignIn />,
-  },
-  {
-    path: "signup",
-    element: <SignUp />,
+    path: "welcome",
+    element: <Welcome />,
   },
 ]);
 
