@@ -8,7 +8,7 @@ using IMGCloud.Application.Interfaces.Auth;
 
 namespace IMGCloud.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api")]
     [ApiController]
     public class AuthController : BaseController
     {
@@ -21,7 +21,7 @@ namespace IMGCloud.API.Controllers
 
         [HttpPost]
         [Route("login")]
-        public async Task<IActionResult> SiginAsync([FromForm] SigInVM model)
+        public async Task<IActionResult> SiginAsync([FromBody] SigInVM model)
         {
             var data = await _authService.SignInAsync(model);
             
@@ -35,7 +35,7 @@ namespace IMGCloud.API.Controllers
 
         [HttpPost]
         [Route("register")]
-        public async Task<IActionResult> RegisterAsync([FromForm] UserVM model)
+        public async Task<IActionResult> RegisterAsync([FromBody] UserVM model)
         {
             var data = await _authService.SignUpAsync(model);
             return ExecuteResult(data.Status, data.Message);

@@ -4,11 +4,6 @@ using IMGCloud.Domain.Models;
 using IMGCloud.Domain.Repositories.Interfaces;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace IMGCloud.Domain.Repositories.Implement
 {

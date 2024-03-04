@@ -1,4 +1,5 @@
-﻿using IMGCloud.Domain.Models;
+﻿using IMGCloud.Data.Entities;
+using IMGCloud.Domain.Models;
 
 namespace IMGCloud.Application.Interfaces.Users
 {
@@ -10,6 +11,7 @@ namespace IMGCloud.Application.Interfaces.Users
         string GetExistedTokenFromDatabase(int userId);
         ResponeVM StoreTokenAsync(TokenVM tokenModel);
         ResponeVM RemveToken();
+        Task<ResponeVM> GetUserInfor(string userName);
 
     }
 }

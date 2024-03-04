@@ -6,6 +6,7 @@ using IMGCloud.Utilities.PasswordHashExtension;
 using IMGCloud.Data.Entities;
 using Microsoft.AspNetCore.Http;
 using IMGCloud.Domain.Repositories.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 
 namespace IMGCloud.Application.Implement.Users
 {
@@ -15,18 +16,21 @@ namespace IMGCloud.Application.Implement.Users
         private readonly ILogger<UserService> _logger;
         private readonly IUserRepository _userRepository;
         private readonly IUserTokenRepository _userTokenRepository;
+        private readonly IUserInfoRepository _userInfoRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
         public UserService(ILogger<UserService> logger,
             IStringLocalizer<UserService> stringLocalizer,
             IUserRepository userRepository,
             IUserTokenRepository userTokenRepository,
+            IUserInfoRepository userInfoRepository,
             IHttpContextAccessor httpContextAccessor)
         {
             _logger = logger;
             _stringLocalizer = stringLocalizer;
             _userRepository = userRepository;
             _userTokenRepository = userTokenRepository;
+            _userInfoRepository = userInfoRepository;
             _httpContextAccessor = httpContextAccessor;
         }
         public async Task<ResponeVM> CreateUserAsync(UserVM model)
@@ -118,6 +122,38 @@ namespace IMGCloud.Application.Implement.Users
         {
             var curentUserId = _userRepository.GetUserId(GetCurrentUserName);
             return _userTokenRepository.RemveToken(curentUserId);
+        }
+
+        public async Task<ResponeVM> GetUserInfor(string userName)
+        {
+            var result = new ResponeVM();
+            try
+            {
+                var user = _userRepository.GetUserId(userName);
+                if (user != 0)
+                {
+                    var userInfo = await _userInfoRepository.GetUserInfobyId(user);
+
+                    if (userInfo is not null)
+                    {
+                        result.Data = userInfo;
+                        result.Status = true;
+                        result.Message = _stringLocalizer["LoginSuccessfully"].ToString();
+                        _logger.LogInformation($"Method {nameof(GetUserInfor)} {result.Message}", result.Message);
+                    }
+                    else
+                    {
+                        result.Message = _stringLocalizer["userNotFound"];
+                        _logger.LogInformation($"Method {nameof(GetUserInfor)} {Environment.NewLine} Error: {result.Message}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                result.Message = ex.Message;
+                _logger.LogError($"Method [{nameof(GetUserInfor)}] {Environment.NewLine} Error: {ex.Message}");
+            }
+            return result;
         }
     }
 }

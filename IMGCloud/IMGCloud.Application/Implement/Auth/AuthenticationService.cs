@@ -79,7 +79,7 @@ namespace IMGCloud.Application.Implement.Auth
 
                                     StoreToken(model.UserName, existedUserToken, expDate);
                                 }
-                                //Case B: Case A: User is not existed or token is expired
+                                //Case B: User is not existed or token is expired
                                 else
                                 {
                                     result.Token = tokenBuilder.GenerateAccessToken(true).Value;

@@ -13,6 +13,7 @@ using IMGCloud.API.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
+var crossDomainOrigins = "imgCloudCrossDomainOrigins";
 
 #region[Localization]
 builder.Services.AddLocalization();
@@ -94,6 +95,15 @@ builder.Services.AddSwaggerGen(c =>
 });
 #endregion
 
+#region [Config-Cors-Domain]
+builder.Services.AddCors(o => o.AddPolicy(name: crossDomainOrigins, builder =>
+{
+    builder.AllowAnyOrigin()
+           .AllowAnyMethod()
+           .AllowAnyHeader();
+}));
+#endregion
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -120,7 +130,7 @@ app.UseSwaggerUI(c =>
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
-
+app.UseCors(crossDomainOrigins);
 app.MapControllers();
 
 app.SeedUp().Run();

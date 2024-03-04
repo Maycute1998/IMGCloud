@@ -29,6 +29,7 @@ namespace IMGCloud.Domain.Models
         public bool Status { get; set; }
 
         public string? Message { get; set; }
+        public object? Data { get; set; }
     }
 
     public class ResponeAuthVM : ResponeVM

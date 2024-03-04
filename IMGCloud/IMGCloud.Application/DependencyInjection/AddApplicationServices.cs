@@ -18,6 +18,7 @@ namespace IMGCloud.Application.DependencyInjection
         {
             services.AddScoped<IUserTokenRepository, UserTokenRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IUserInfoRepository, UserInfoRepository>();
             services.AddScoped<IPostRepository, PostRepository>();
         }
 
