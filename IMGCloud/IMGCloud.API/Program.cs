@@ -123,6 +123,4 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-UserSeed.SeedUp(configuration.GetConnectionString("DefaultConnectString"));
-
-app.Run();
+app.SeedUp().Run();
