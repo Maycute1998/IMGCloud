@@ -1,10 +1,11 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import "./index.css";
-import App from "./App";
-import reportWebVitals from "./reportWebVitals";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import App from "./App";
+import UserInfo from "./containers/userinfo";
 import Welcome from "./containers/welcome";
+import "./index.css";
+import reportWebVitals from "./reportWebVitals";
 
 const router = createBrowserRouter([
   {
@@ -15,6 +16,10 @@ const router = createBrowserRouter([
     path: "welcome",
     element: <Welcome />,
   },
+  {
+    path: "setup",
+    element: <UserInfo />,
+  }
 ]);
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
