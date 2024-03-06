@@ -258,6 +258,29 @@ only screen and (min--moz-device-pixel-ratio: 1.5),
 only screen and (min-device-pixel-ratio: 1.5) {
 }
  
+
+/* Surface Duo Portrait */
+@media screen and (max-device-width: 540px) and (orientation:portrait) {
+    .signin-container {
+        width: 80%;
+        bottom: 5%;
+        min-height: unset;
+        height: auto;
+
+        .form-container {
+            height: 100%;
+        }
+
+        .sign-in {
+            width: 100%;
+        }
+
+        .toggle-container {
+            display: none;
+        }
+    }
+} 
+
 /* iPhone Portrait */
 @media screen and (max-device-width: 480px) and (orientation:portrait) {
     .signin-container {
@@ -291,3 +314,22 @@ only screen and (min-device-pixel-ratio: 1.5) {
 @media screen and (min-device-width: 481px) and (orientation:landscape) {
 }
  
+@media screen and (max-width: 480px) and (orientation:portrait) {
+    .signin-container {
+        width: 80%;
+        height: auto;
+        bottom: 5%;
+
+        .form-container {
+            height: 100%;
+        }
+
+        .sign-in {
+            width: 100%;
+        }
+
+        .toggle-container {
+            display: none;
+        }
+    }
+}
