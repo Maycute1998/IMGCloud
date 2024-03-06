@@ -10,6 +10,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using IMGCloud.Application.DependencyInjection;
 using IMGCloud.API.Persistence;
+using Amazon.S3;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -28,6 +29,11 @@ builder.Services.AddControllers();
 builder.Services.AddDbContext<IMGCloudContext>(options => options.UseSqlServer(configuration.GetConnectionString("DefaultConnectString")));
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddServiceApplication();
+
+#region[AWSService]
+builder.Services.AddDefaultAWSOptions(configuration.GetAWSOptions());
+builder.Services.AddAWSService<IAmazonS3>();
+#endregion
 
 #region JWT Config
 builder.Services.AddAuthentication(opt =>
