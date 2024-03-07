@@ -10,8 +10,8 @@ import AvatarUpload from "../common/avatar-upload";
 import "./user-info.scss";
 
 const steps = [
-  "Tell us more about you",
-  "Upload your profile picture",
+  "About you",
+  "Upload profile picture",
   "What are you interested in?",
 ];
 
@@ -80,12 +80,15 @@ const UserInfo = () => {
 
   return (
     <div className="user-info">
+      <div class="logo">
+        <img class="logo-image" src="/img/imgcloud-logo.png" alt="logo" />
+      </div>
       <Box sx={{ width: "100%" }}>
         <Stepper activeStep={activeStep}>
           {steps.map((label, index) => {
             const stepProps = {};
             const labelProps = {};
-            
+
             if (isStepSkipped(index)) {
               stepProps.completed = false;
             }
@@ -109,43 +112,53 @@ const UserInfo = () => {
         ) : (
           <React.Fragment>
             <Typography sx={{ mt: 2, mb: 1 }}>Step {activeStep + 1}</Typography>
-            <div className="user-form">
-              <div class="form">
-                <input
-                  type="text"
-                  placeholder="Your (full) name"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
+            {activeStep === 0 && (
+              <div className="user-form">
+                <div class="form">
+                  <input
+                    type="text"
+                    placeholder="Your (full) name"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
 
-                <input
-                  type="date"
-                  placeholder="Your date of birth"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                />
+                  <input
+                    type="date"
+                    placeholder="Your date of birth"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                  />
 
-                <input
-                  type="text"
-                  placeholder="You are living in..."
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
+                  <input
+                    type="text"
+                    placeholder="You are living in..."
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                  <input type="text" placeholder="Bio" />
+                </div>
               </div>
-              <div className="user-upload-img">
-                <Button
-                  variant="outlined"
-                  onClick={handleClickOpenUploadAvatar}
-                >
-                  Upload
-                </Button>
-                <AvatarUpload
-                  selectedValue={selectedValue}
-                  open={open}
-                  onCloseUploadAvatar={handleCloseUploadAvatar}
-                />
+            )}
+
+            {activeStep === 1 && (
+              <div className="user-form">
+                <div className="user-upload-img">
+                  <Button
+                    variant="outlined"
+                    onClick={handleClickOpenUploadAvatar}
+                  >
+                    Upload
+                  </Button>
+                  <AvatarUpload
+                    selectedValue={selectedValue}
+                    open={open}
+                    onCloseUploadAvatar={handleCloseUploadAvatar}
+                  />
+                  {/* <img src={preview} alt="Preview" /> */}
+                </div>
               </div>
-            </div>
+            )}
+
             <div className="steps">
               <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
                 <Button
