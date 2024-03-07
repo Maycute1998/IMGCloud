@@ -11,6 +11,11 @@ using System.Text;
 using IMGCloud.Application.DependencyInjection;
 using IMGCloud.API.Persistence;
 using Amazon.S3;
+using Amazon.Extensions.NETCore.Setup;
+using Amazon.Runtime;
+using Amazon;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -31,7 +36,14 @@ builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddServiceApplication();
 
 #region[AWSService]
-builder.Services.AddDefaultAWSOptions(configuration.GetAWSOptions());
+var accessKey = configuration["AWS:Credentials:AccessKey"];
+var secretAccessKey = configuration["AWS:Credentials:SecretKey"];
+var awsOptions = new AWSOptions
+{
+    Credentials = new BasicAWSCredentials(accessKey, secretAccessKey),
+    Region = RegionEndpoint.APSoutheast2
+};
+builder.Services.AddDefaultAWSOptions(awsOptions);
 builder.Services.AddAWSService<IAmazonS3>();
 #endregion
 
@@ -39,7 +51,7 @@ builder.Services.AddAWSService<IAmazonS3>();
 builder.Services.AddAuthentication(opt =>
 {
     opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    opt.DefaultChallengeScheme  = JwtBearerDefaults.AuthenticationScheme;
+    opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
     //opt.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
 }).AddJwtBearer(opt =>
 {
@@ -74,7 +86,7 @@ builder.Services.AddSwaggerGen(c =>
 
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
-        Description ="IMGCloud API",
+        Description = "IMGCloud API",
         Name = "Authorization",
         In = ParameterLocation.Header,
         Type = SecuritySchemeType.ApiKey,

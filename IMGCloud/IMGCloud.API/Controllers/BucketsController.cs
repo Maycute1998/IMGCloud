@@ -11,12 +11,16 @@ namespace IMGCloud.API.Controllers
     public class BucketsController : ControllerBase
     {
         private readonly IAmazonS3 _s3Client;
-        private string bucketName = "imgcloudbucket";
-        private string prefix = "photos";
+        private readonly IConfiguration _configuration;
+        private string bucketName;
+        private string prefix;
 
-        public BucketsController(IAmazonS3 s3Client)
+        public BucketsController(IAmazonS3 s3Client, IConfiguration configuration)
         {
             _s3Client = s3Client;
+            _configuration = configuration;
+            bucketName = _configuration["AWS:AWSConfig:bucketName"];
+            prefix = _configuration["AWS:AWSConfig:prefix"];
         }
 
         //Upload Files to AWS S3
@@ -39,12 +43,39 @@ namespace IMGCloud.API.Controllers
             return NotFound($"Bucket {bucketName} does not exist.");
         }
 
+        [HttpPost("upload")]
+        public async Task<IActionResult> UploadAvatarAsync([FromForm]string base64String)
+        {
+            try
+            {
+                base64String = base64String.Replace("data:image/png;base64,", "");
+                byte[] bytes = Convert.FromBase64String(base64String);
+
+                var request = new PutObjectRequest
+                {
+                    BucketName = bucketName,
+                    Key = string.IsNullOrEmpty(prefix) ? "avatar.jpg" : $"{ prefix?.TrimEnd('/')}/avatar.jpg",
+                };
+                using (var ms = new MemoryStream(bytes))
+                {
+                    request.InputStream = ms;
+                    await _s3Client.PutObjectAsync(request);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("AWS Fail");
+            }
+            return Ok();
+        }
+
+
         //Get All the Files in an AWS S3 
         [HttpGet("get-all")]
         public async Task<IActionResult> GetAllFilesAsync()
         {
             var bucketExists = await DoesS3BucketExistAsync();
-            if (!bucketExists.Status)
+            if (bucketExists.Status)
             {
                 var request = new ListObjectsV2Request()
                 {
@@ -76,7 +107,7 @@ namespace IMGCloud.API.Controllers
         public async Task<IActionResult> GetFileByKeyAsync(string bucketName, string key)
         {
             var isExistBucket = await DoesS3BucketExistAsync();
-            if (!isExistBucket.Status)
+            if (isExistBucket.Status)
             {
                 var s3Object = await _s3Client.GetObjectAsync(bucketName, key);
                 File(s3Object.ResponseStream, s3Object.Headers.ContentType);
@@ -89,7 +120,7 @@ namespace IMGCloud.API.Controllers
         public async Task<IActionResult> DeleteFileAsync(string key)
         {
             var isExistBucket = await DoesS3BucketExistAsync();
-            if (!isExistBucket.Status)
+            if (isExistBucket.Status)
             {
                 await _s3Client.DeleteObjectAsync(bucketName, key);
 

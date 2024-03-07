@@ -4,7 +4,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 import React, { useState } from "react";
 import Avatar from "react-avatar-edit";
 const AvatarUpload = (props) => {
-  const { onCloseUploadAvatar, selectedValue, open } = props;
+  const { onCloseUploadAvatar, selectedValue, open, getPreviewValue } = props;
 
   const [src, setSrc] = useState("");
   const [preview, setPreview] = useState("");
@@ -17,6 +17,7 @@ const AvatarUpload = (props) => {
 
   const handleClose = () => {
     onCloseUploadAvatar(selectedValue);
+    if (getPreviewValue) getPreviewValue(preview);
   };
   return (
     <div>
@@ -41,7 +42,6 @@ const AvatarUpload = (props) => {
           </Button>
         </DialogActions>
       </Dialog>
-      <img src={preview} alt="Preview" />
     </div>
   );
 };

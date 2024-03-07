@@ -25,6 +25,7 @@ const UserInfo = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
+  const [imgSrc, setImageSrc] = useState("");
   const navigate = useNavigate();
 
   const handleClickOpenUploadAvatar = () => {
@@ -85,7 +86,7 @@ const UserInfo = () => {
           {steps.map((label, index) => {
             const stepProps = {};
             const labelProps = {};
-            
+
             if (isStepSkipped(index)) {
               stepProps.completed = false;
             }
@@ -143,7 +144,10 @@ const UserInfo = () => {
                   selectedValue={selectedValue}
                   open={open}
                   onCloseUploadAvatar={handleCloseUploadAvatar}
+                  getPreviewValue={(value) => setImageSrc(value)}
                 />
+                <img src={imgSrc} alt="Preview" />
+                <img src="https://imgcloudbucket.s3.ap-southeast-2.amazonaws.com/photos/uniqlo.jpg?X-Amz-Expires=60&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIA5FTZDX6FBGQ7GFM2%2F20240307%2Fap-southeast-2%2Fs3%2Faws4_request&X-Amz-Date=20240307T053041Z&X-Amz-SignedHeaders=host&X-Amz-Signature=bcbca145d6c72640f83378a122a143b2a90942f2f579ad508c3c627494084bb6" alt="Preview" />
               </div>
             </div>
             <div className="steps">
