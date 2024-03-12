@@ -2,11 +2,32 @@
 
 namespace IMGCloud.Domain.Cores;
 
-public class ApiResult<T>
+public class ApiResult<T> : ApiResult
+{
+    public T? Context { get; set; }
+
+    public ApiResult()
+    {
+    }
+
+    [JsonConstructor]
+    public ApiResult(bool isSucceeded, T context, string? message = default)
+        : base(isSucceeded, message)
+    {
+        this.Context = context;
+    }
+
+    public T GetResult()
+    {
+        return this.Context!;
+    }
+}
+
+public class ApiResult
 {
     public string? Message { get; set; }
     public bool IsSucceeded { get; set; }
-    public T? Result { get; set; }
+
     public ApiResult()
     {
     }
@@ -16,17 +37,5 @@ public class ApiResult<T>
     {
         this.Message = message;
         this.IsSucceeded = isSucceeded;
-    }
-
-    public ApiResult(bool isSucceeded, T data, string? message = default)
-    {
-        this.Result = data;
-        this.IsSucceeded = isSucceeded;
-        this.Message = message;
-    }
-
-    public T GetResult()
-    {
-        return this.Result!;
     }
 }

@@ -12,7 +12,8 @@ namespace IMGCloud.Infrastructure.Repositories;
 public interface IRepositoryBase<TEntity, TKey> :
     IActionRepositoryBase<TEntity, TKey>,
     ISyncRepository<TEntity, TKey>,
-    IQueryRepository<TEntity, TKey>
+    IQueryRepository<TEntity, TKey>,
+    IDisposable
     where TEntity : EntityBase<TKey>
 {
 }
@@ -36,7 +37,7 @@ public interface ISyncRepository<TEntity, TKey>
     where TEntity : EntityBase<TKey>
 {
     void Create(TEntity entity);
-    IList<TKey> Create(IEnumerable<TEntity> entities);
+    void Create(IEnumerable<TEntity> entities);
     void Update(TEntity entity);
     void Update(IEnumerable<TEntity> entities);
     void Delete(TEntity entity);
@@ -49,7 +50,7 @@ public interface IQueryRepository<TEntity, TKey>
     IQueryable<TEntity> FindAll(bool trackChanges = false);
     IQueryable<TEntity> FindAll(bool trackChanges = false, params Expression<Func<TEntity, object>>[] includedProperties);
     IQueryable<TEntity> FindBy(Expression<Func<TEntity, bool>> expression, bool trackChanges = false);
-    IQueryable<TEntity> FindBy(Expression<Func<TEntity, bool>> expression, bool trackChanges = false, params Expression<Func<TEntity, object>>[] includedProperties);
-    Task<TEntity?> GetByIdAsync(TKey id);
-    Task<TEntity?> GetByIdAsync(TKey id, params Expression<Func<TEntity, object>>[] includedProperties);
+    IQueryable<TEntity> FindBy(Expression<Func<TEntity, bool>> expression, Expression<Func<TEntity, object>>[] includedProperties, bool trackChanges = false);
+    Task<TEntity?> GetByIdAsync(TKey id, CancellationToken cancellationToken = default);
+    Task<TEntity?> GetByIdAsync(TKey id, Expression<Func<TEntity, object>>[] includedProperties, CancellationToken cancellationToken = default);
 }

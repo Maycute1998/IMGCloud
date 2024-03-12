@@ -1,18 +1,13 @@
 ﻿using IMGCloud.Application.Interfaces.Auth;
 using IMGCloud.Application.Interfaces.Cache;
 using IMGCloud.Application.Interfaces.Users;
-using IMGCloud.Domain.Models;
+using IMGCloud.Domain.Cores;
 using IMGCloud.Utilities.TokenBuilder;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace IMGCloud.Application.Implement.Auth
 {
@@ -38,9 +33,9 @@ namespace IMGCloud.Application.Implement.Auth
             _redisCache = redisCache;
         }
 
-        public async Task<ResponeAuthVM> SignInAsync(SigInVM model)
+        public async Task<AuthencationApiResult<string>> SignInAsync(SigInVM model)
         {
-            var result = new ResponeAuthVM();
+            var result = new AuthencationApiResult<string>();
             var tokenBuilder = new JwtTokenBuilder();
             tokenBuilder
                    .AddSecurityKey(JwtSecurityKey.Create(_configuration["TokenConfigs:SecurityKey"]))
@@ -74,16 +69,16 @@ namespace IMGCloud.Application.Implement.Auth
                                 // Case A: User is existed and token is not expired
                                 if (!existedToken)
                                 {
-                                    result.Token = existedUserToken;
-                                    result.Status = true;
+                                    result.Result = existedUserToken;
+                                    result.IsSucceeded = true;
 
                                     StoreToken(model.UserName, existedUserToken, expDate);
                                 }
                                 //Case B: User is not existed or token is expired
                                 else
                                 {
-                                    result.Token = tokenBuilder.GenerateAccessToken(true).Value;
-                                    result.Status = true;
+                                    result.Result = tokenBuilder.GenerateAccessToken(true).Value;
+                                    result.IsSucceeded = true;
 
                                     // Genarate new user token and store to database
                                     var userToken = tokenBuilder.GenerateAccessToken(true).Value;
@@ -94,13 +89,13 @@ namespace IMGCloud.Application.Implement.Auth
                         }
                         else
                         {
-                            result.Token = tokenBuilder.GenerateAccessToken(true).Value;
-                            var newClaimsData = tokenBuilder.GetPrincipalFromExpiredToken(_configuration, result.Token);
+                            result.Result = tokenBuilder.GenerateAccessToken(true).Value;
+                            var newClaimsData = tokenBuilder.GetPrincipalFromExpiredToken(_configuration, result.Result);
                             var expiryDate = long.Parse(newClaimsData.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Exp).Value);
                             var expDate = UnixTimeStampToDateTime(expiryDate);
 
-                            StoreToken(model.UserName, result.Token, expDate);
-                            result.Status = true;
+                            StoreToken(model.UserName, result.Result, expDate);
+                            result.IsSucceeded = true;
                         }
                     }
                 }
@@ -108,6 +103,7 @@ namespace IMGCloud.Application.Implement.Auth
             catch (Exception ex)
             {
                 result.Message = ex.Message;
+                result.IsSucceeded = false;
                 _logger.LogError($"Sigin {nameof(SignInAsync)}, Error: {_stringLocalizer["userNotFound"]}");
             }
             return result;
@@ -147,6 +143,7 @@ namespace IMGCloud.Application.Implement.Auth
             }
             return isExistedTokenExpired;
         }
+
         private DateTime UnixTimeStampToDateTime(double unixTimeStamp)
         {
             // Unix timestamp is seconds past epoch
@@ -158,7 +155,7 @@ namespace IMGCloud.Application.Implement.Auth
         private void StoreToken(string userName, string userToken, DateTime expireDate)
         {
             var keyRedis = $"redis-{userName}";
-            var token = new TokenVM
+            var token = new UserTokenContext()
             {
                 UserName = userName,
                 Token = userToken,

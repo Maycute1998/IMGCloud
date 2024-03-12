@@ -1,6 +1,6 @@
 ﻿namespace IMGCloud.Domain.Entities;
 
-public class UserInfo : EntityBase<int>
+public class UserDetail : EntityBase<int>
 {
     public int UserId { get; set; }
 
