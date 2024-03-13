@@ -11,10 +11,12 @@ namespace IMGCloud.API.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly IAuthenticationService _authService;
+    private readonly IGoogleService _googleService;
 
-    public AuthController(IAuthenticationService authService)
+    public AuthController(IAuthenticationService authService, IGoogleService googleService)
     {
         _authService = authService;
+        _googleService = googleService;
     }
 
     [HttpPost]
@@ -41,5 +43,12 @@ public class AuthController : ControllerBase
         });
     }
 
+    [HttpPost]
+    [Route("google-signin")]
+    public async Task<IActionResult> GoogleSiginAsync(GoogleAuthenticationContext context)
+    {
+        var data = await _googleService.VerifyTokenAsync(context);
 
+        return Ok(data);
+    }
 }

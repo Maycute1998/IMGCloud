@@ -62,6 +62,7 @@ public static partial class WebApplicationExtensions
         services.AddScoped<IPostService, PostService>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IAuthenticationService, AuthenticationService>();
+        services.AddScoped<IAuthExternalService, AuthExternalService>();
         services.AddScoped<ICacheService, CacheService>();
         services.AddScoped<IAmazonBucketService, AmazonBucketService>();
     }
