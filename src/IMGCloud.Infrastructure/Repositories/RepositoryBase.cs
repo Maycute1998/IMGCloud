@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 
 namespace IMGCloud.Infrastructure.Repositories;
 
-public abstract class RepositoryBase<TEntity, TKey> : IRepositoryBase<TEntity, TKey>
+public class RepositoryBase<TEntity, TKey> : IRepositoryBase<TEntity, TKey>
     where TEntity : EntityBase<TKey>
 {
     protected readonly ImgCloudContext dbContext;

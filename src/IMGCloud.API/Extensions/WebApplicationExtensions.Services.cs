@@ -1,5 +1,7 @@
 ﻿using IMGCloud.Domain.Options;
 using IMGCloud.Infrastructure;
+using IMGCloud.Infrastructure.Repositories;
+using IMGCloud.Infrastructure.Services;
 using IMGCloud.Utilities.Languages;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -16,6 +18,8 @@ public static partial class WebApplicationExtensions
     {
         builder.Services.AddControllers();
         builder.Services.AddEndpointsApiExplorer();
+
+        builder.Services.AddApplicationOptions(builder.Configuration);
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 
         builder.Services.AddLocalization();
@@ -30,7 +34,7 @@ public static partial class WebApplicationExtensions
         builder.Services.AddRepositoryApplication();
         builder.Services.AddServiceApplication();
 
-        builder.Services.ConfigureJwt(builder.Configuration);
+        builder.Services.ConfigureJwt();
         builder.Services.ConfigureSwagger();
         builder.Services.ConfigureCors();
 
@@ -39,15 +43,24 @@ public static partial class WebApplicationExtensions
 
     internal static void AddRepositoryApplication(this IServiceCollection services)
     {
-
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
+        services.AddScoped(typeof(IRepositoryBase<,>), typeof(RepositoryBase<,>));
+        services.AddScoped<IPostRepository, PostRepository>();
+        services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IUserTokenRepository, UserTokenRepository>();
+        services.AddScoped<IUserDetailRepository, UserDetailRepository>();
     }
 
     internal static void AddServiceApplication(this IServiceCollection services)
     {
-
+        services.AddScoped<IPostService, PostService>();
+        services.AddScoped<IUserService, UserService>();
+        services.AddScoped<IAuthenticationService, AuthenticationService>();
+        services.AddScoped<ICacheService, CacheService>();
+        services.AddScoped<IAmazonBucketService, AmazonBucketService>();
     }
 
-    internal static void AddOptions(this IServiceCollection services, IConfiguration configuration)
+    internal static void AddApplicationOptions(this IServiceCollection services, IConfiguration configuration)
     {
         var amazonBulket = configuration.GetSection(nameof(AmazonBulketOptions)).Get<AmazonBulketOptions>();
         ArgumentNullException.ThrowIfNull(amazonBulket);
@@ -62,16 +75,16 @@ public static partial class WebApplicationExtensions
         services.AddSingleton(tokenOptions);
     }
 
-    internal static void ConfigureJwt(this IServiceCollection services, IConfiguration configuration)
+    internal static void ConfigureJwt(this IServiceCollection services)
     {
+        var provider = services.BuildServiceProvider();
+        var tokenOptions = provider.GetRequiredService<TokenOptions>();
         services.AddAuthentication(opt =>
         {
             opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
             opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
         }).AddJwtBearer(opt =>
         {
-            //opt.SaveToken = true;
-            //opt.RequireHttpsMetadata = false;
             opt.TokenValidationParameters = new TokenValidationParameters
             {
                 ValidateIssuer = true,
@@ -82,9 +95,9 @@ public static partial class WebApplicationExtensions
                 ClockSkew = TimeSpan.Zero,
 
 
-                ValidIssuer = configuration["TokenConfigs:Issuer"],
-                ValidAudience = configuration["TokenConfigs:Audience"],
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["TokenConfigs:SecurityKey"]))
+                ValidIssuer = tokenOptions.Issuer,
+                ValidAudience = tokenOptions.Audience,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenOptions.SecurityKey))
             };
         });
     }
