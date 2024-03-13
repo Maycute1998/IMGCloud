@@ -155,5 +155,32 @@ namespace IMGCloud.Application.Implement.Users
             }
             return result;
         }
+
+        public async Task<ResponeVM> IsExistEmailAsync(string email)
+        {
+            var result = new ResponeVM();
+            try
+            {
+                var user = await _userRepository.IsExitsUserEmailAsync(email);
+                if (user)
+                {
+                    result.Status = true;
+                    result.Message = _stringLocalizer["userExisted"].ToString();
+                    _logger.LogInformation($"Method {nameof(GetUserInfor)} {result.Message}", result.Message);
+                }
+                else
+                {
+                    result.Status = false;
+                    result.Message = _stringLocalizer["userNotFound"];
+                    _logger.LogInformation($"Method {nameof(GetUserInfor)} {Environment.NewLine} Error: {result.Message}");
+                }
+            }
+            catch (Exception ex)
+            {
+                result.Message = ex.Message;
+                _logger.LogError($"Method [{nameof(GetUserInfor)}] {Environment.NewLine} Error: {ex.Message}");
+            }
+            return result;
+        }
     }
 }

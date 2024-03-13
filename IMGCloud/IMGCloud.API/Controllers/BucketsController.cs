@@ -43,7 +43,7 @@ namespace IMGCloud.API.Controllers
             return NotFound($"Bucket {bucketName} does not exist.");
         }
 
-        [HttpPost("upload")]
+        [HttpPost("upload-avatar")]
         public async Task<IActionResult> UploadAvatarAsync([FromForm]string base64String)
         {
             try

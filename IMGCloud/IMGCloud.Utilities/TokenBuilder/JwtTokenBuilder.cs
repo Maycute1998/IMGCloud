@@ -122,14 +122,10 @@ namespace IMGCloud.Utilities.TokenBuilder
             var signingKey = _configuration["TokenConfigs:SecurityKey"];
             var tokenValidationParameters = new TokenValidationParameters
             {
-                ValidateIssuer = true,
-                ValidateAudience = true,
-                ValidateLifetime = true,
+                ValidateIssuer = false,
+                ValidateAudience = false,
+                ValidateLifetime = false,
                 ValidateIssuerSigningKey = true,
-                SaveSigninToken = true,
-
-                ValidIssuer = validIssuer,
-                ValidAudience = validAudience,
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(signingKey))
             };
             var tokenHandler = new JwtSecurityTokenHandler();

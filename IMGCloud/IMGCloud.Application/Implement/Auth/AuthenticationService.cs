@@ -3,15 +3,10 @@ using IMGCloud.Application.Interfaces.Cache;
 using IMGCloud.Application.Interfaces.Users;
 using IMGCloud.Domain.Models;
 using IMGCloud.Utilities.TokenBuilder;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace IMGCloud.Application.Implement.Auth
@@ -41,9 +36,8 @@ namespace IMGCloud.Application.Implement.Auth
         public async Task<ResponeAuthVM> SignInAsync(SigInVM model)
         {
             var result = new ResponeAuthVM();
-            var tokenBuilder = new JwtTokenBuilder();
-            tokenBuilder
-                   .AddSecurityKey(JwtSecurityKey.Create(_configuration["TokenConfigs:SecurityKey"]))
+            var tokenBuilder = new JwtTokenBuilder()
+                .AddSecurityKey(JwtSecurityKey.Create(_configuration["TokenConfigs:SecurityKey"]))
                    .AddSubject(model.UserName)
                    .AddIssuer(_configuration["TokenConfigs:Issuer"])
                    .AddAudience(_configuration["TokenConfigs:Audience"])
@@ -55,46 +49,46 @@ namespace IMGCloud.Application.Implement.Auth
                 var isExistUser = await _userService.IsActiveUserAsync(model);
                 if (isExistUser is not null)
                 {
-                    result.Message = isExistUser.Message;
                     var userId = _userService.GetUserId(model.UserName);
                     if (userId != 0)
                     {
                         var existedUserToken = _userService.GetExistedTokenFromDatabase(userId);
                         if (!string.IsNullOrEmpty(existedUserToken))
                         {
-
                             var oldclaimsData = tokenBuilder.GetPrincipalFromExpiredToken(_configuration, existedUserToken);
+                            var expiryDate = long.Parse(oldclaimsData.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Exp).Value);
+                            var expDate = UnixTimeStampToDateTime(expiryDate);
+                            result.Status = true;
+
                             if (oldclaimsData is not null)
                             {
-                                var expiryDate = long.Parse(oldclaimsData.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Exp).Value);
-
-                                var expDate = UnixTimeStampToDateTime(expiryDate);
-
                                 var existedToken = IsExistedTokenExpired(existedUserToken, expDate);
+
                                 // Case A: User is existed and token is not expired
                                 if (!existedToken)
                                 {
                                     result.Token = existedUserToken;
-                                    result.Status = true;
-
+                                    // Store new token to database
                                     StoreToken(model.UserName, existedUserToken, expDate);
                                 }
                                 //Case B: User is not existed or token is expired
                                 else
                                 {
-                                    result.Token = tokenBuilder.GenerateAccessToken(true).Value;
-                                    result.Status = true;
-
-                                    // Genarate new user token and store to database
-                                    var userToken = tokenBuilder.GenerateAccessToken(true).Value;
-                                    StoreToken(model.UserName, userToken, expDate);
+                                    result.Token = BuildTokenData(model);
+                                    // Store new token to database
+                                    StoreToken(model.UserName, result.Token, expDate);
                                 }
                             }
-                            else { _logger.LogError($"{nameof(SignInAsync)} Error: oldclaimsData is null"); }
+                            else 
+                            {
+                                result.Token = BuildTokenData(model);
+                                // Store new token to database
+                                StoreToken(model.UserName, result.Token, expDate);
+                            }
                         }
                         else
                         {
-                            result.Token = tokenBuilder.GenerateAccessToken(true).Value;
+                            result.Token = BuildTokenData(model);
                             var newClaimsData = tokenBuilder.GetPrincipalFromExpiredToken(_configuration, result.Token);
                             var expiryDate = long.Parse(newClaimsData.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Exp).Value);
                             var expDate = UnixTimeStampToDateTime(expiryDate);
@@ -127,6 +121,19 @@ namespace IMGCloud.Application.Implement.Auth
             return await _userService.CreateUserAsync(model);
         }
 
+        private string BuildTokenData(SigInVM model)
+        {
+            var tokenBuilder = new JwtTokenBuilder()
+                   .AddSecurityKey(JwtSecurityKey.Create(_configuration["TokenConfigs:SecurityKey"]))
+                   .AddSubject(model.UserName)
+                   .AddIssuer(_configuration["TokenConfigs:Issuer"])
+                   .AddAudience(_configuration["TokenConfigs:Audience"])
+                   .AddClaim(_configuration["TokenConfigs:ClaimKey"], _configuration["TokenConfigs:ClaimValue"])
+                   .AddUserName(model.UserName)
+                   .AddExpiryDate(int.Parse(_configuration["TokenConfigs:Expiry"]))
+                   .GenerateAccessToken();
+            return tokenBuilder.Value;
+        }
         private bool IsExistedTokenExpired(string existedUserToken, DateTime expDate)
         {
             bool isExistedTokenExpired = false;
@@ -166,14 +173,14 @@ namespace IMGCloud.Application.Implement.Auth
                 IsActive = true
             };
             _userService.StoreTokenAsync(token);
-            _redisCache.RemoveData(keyRedis);
+            //_redisCache.RemoveData(keyRedis);
             var redisData = new RedisAuthenticationVM
             {
                 RedisKey = userName,
                 Token = userToken,
                 ExpireDate = expireDate
             };
-            _redisCache.SetData(keyRedis, redisData, expireDate);
+            //_redisCache.SetData(keyRedis, redisData, expireDate);
         }
     }
 }

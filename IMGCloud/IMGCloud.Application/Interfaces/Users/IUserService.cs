@@ -7,6 +7,7 @@ namespace IMGCloud.Application.Interfaces.Users
     {
         int GetUserId(string userName);
         Task<ResponeVM> IsActiveUserAsync(SigInVM user);
+        Task<ResponeVM> IsExistEmailAsync(string email);
         Task<ResponeVM> CreateUserAsync(UserVM model);
         string GetExistedTokenFromDatabase(int userId);
         ResponeVM StoreTokenAsync(TokenVM tokenModel);
