@@ -2,6 +2,7 @@
 using Amazon.S3.Model;
 using IMGCloud.Infrastructure.Services;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading;
 
 namespace IMGCloud.API.Controllers
 {
@@ -17,31 +18,31 @@ namespace IMGCloud.API.Controllers
         }
 
         [HttpPost("upload")]
-        public async Task<IActionResult> UploadFileAsync(IFormFile file)
+        public async Task<IActionResult> UploadFileAsync(IFormFile file, CancellationToken cancellationToken = default)
         {
-            var result = await service.UploadFileAsync(file);
+            var result = await service.UploadFileAsync(file, cancellationToken);
             return string.IsNullOrWhiteSpace(result) ? this.Ok(result) : this.BadRequest();
 
         }
 
         [HttpGet("get-all")]
-        public async Task<IActionResult> GetAllFilesAsync()
+        public async Task<IActionResult> GetAllFilesAsync(CancellationToken cancellationToken = default)
         {
-            var result = await this.service.GetAllAsync();
+            var result = await this.service.GetAllAsync(cancellationToken);
             return Ok(result);
         }
 
         [HttpGet("get-by-key")]
-        public async Task<IActionResult> GetFileByKeyAsync(string bucketName, string key)
+        public async Task<IActionResult> GetFileByKeyAsync(string key, CancellationToken cancellationToken = default)
         {
-            var result = await this.service.GetAsync(key);
+            var result = await this.service.GetAsync(key, cancellationToken);
             return result is null ? NotFound() : Ok(result);
         }
 
         [HttpDelete("delete")]
-        public async Task<IActionResult> DeleteFileAsync(string key)
+        public async Task<IActionResult> DeleteFileAsync(string key, CancellationToken cancellationToken = default)
         {
-            await this.service.DeleteAsync(key);
+            await this.service.DeleteAsync(key, cancellationToken);
             return Ok();
         }
     }

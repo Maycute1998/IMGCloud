@@ -1,10 +1,7 @@
 ﻿using IMGCloud.Domain.Entities;
 using IMGCloud.Infrastructure.Extensions;
 using IMGCloud.Infrastructure.Requests;
-using IMGCloud.Utilities.AutoMapper;
-using IMGCloud.Utilities.PasswordHashExtension;
 using Microsoft.EntityFrameworkCore;
-using System.Threading;
 
 namespace IMGCloud.Infrastructure.Repositories;
 

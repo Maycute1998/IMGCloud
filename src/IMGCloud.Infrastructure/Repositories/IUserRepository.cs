@@ -10,5 +10,5 @@ public interface IUserRepository
     Task CreateUserAsync(CreateUserRequest model, CancellationToken cancellationToken = default);
     Task<bool> IsActiveUserAsync(string userName, CancellationToken cancellationToken = default);
     Task<int> GetUserIdByUserNameAsync(string userName, CancellationToken cancellationToken = default);
-    Task<User?> GetUserByUserNameAsync(string? userName, CancellationToken cancellationToken = default);
+    Task<User?> GetUserByUserNameAsync(string userName, CancellationToken cancellationToken = default);
 }
