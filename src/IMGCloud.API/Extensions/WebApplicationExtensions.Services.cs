@@ -1,10 +1,12 @@
-﻿using IMGCloud.Domain.Options;
+﻿using Amazon.S3;
+using IMGCloud.Domain.Options;
 using IMGCloud.Infrastructure;
 using IMGCloud.Infrastructure.Repositories;
 using IMGCloud.Infrastructure.Services;
 using IMGCloud.Utilities.Languages;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Localization;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -19,7 +21,10 @@ public static partial class WebApplicationExtensions
         builder.Services.AddControllers();
         builder.Services.AddEndpointsApiExplorer();
 
+        builder.Services.AddDbContext<ImgCloudContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnectString")));
         builder.Services.AddApplicationOptions(builder.Configuration);
+
+        builder.Services.AddRepositoryApplication();
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 
         builder.Services.AddLocalization();
@@ -28,13 +33,13 @@ public static partial class WebApplicationExtensions
         builder.Services.AddDistributedMemoryCache();
         builder.Services.AddSingleton<IStringLocalizerFactory, JsonStringLocalizerFactory>();
 
-        builder.Services.AddDbContext<ImgCloudContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnectString")));
-        builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
-        builder.Services.AddRepositoryApplication();
+        builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+        builder.Services.ConfigureAmazonS3(builder.Configuration);
+
         builder.Services.AddServiceApplication();
 
-        builder.Services.ConfigureJwt();
+        builder.Services.ConfigureJwt(builder.Configuration);
         builder.Services.ConfigureSwagger();
         builder.Services.ConfigureCors();
 
@@ -43,8 +48,9 @@ public static partial class WebApplicationExtensions
 
     internal static void AddRepositoryApplication(this IServiceCollection services)
     {
-        services.AddScoped<IUnitOfWork, UnitOfWork>();
-        services.AddScoped(typeof(IRepositoryBase<,>), typeof(RepositoryBase<,>));
+        services.AddTransient(typeof(IUnitOfWork), typeof(UnitOfWork));
+        services.AddTransient(typeof(IRepositoryBase<,>), typeof(RepositoryBase<,>));
+
         services.AddScoped<IPostRepository, PostRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IUserTokenRepository, UserTokenRepository>();
@@ -75,10 +81,12 @@ public static partial class WebApplicationExtensions
         services.AddSingleton(tokenOptions);
     }
 
-    internal static void ConfigureJwt(this IServiceCollection services)
+    internal static void ConfigureJwt(this IServiceCollection services, IConfiguration configuration)
     {
-        var provider = services.BuildServiceProvider();
-        var tokenOptions = provider.GetRequiredService<TokenOptions>();
+        var tokenOptions = configuration.GetSection(nameof(TokenOptions)).Get<TokenOptions>();
+        ArgumentNullException.ThrowIfNull(tokenOptions);
+        //var provider = services.BuildServiceProvider();
+        //var tokenOptions = provider.GetRequiredService<TokenOptions>();
         services.AddAuthentication(opt =>
         {
             opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -150,5 +158,11 @@ public static partial class WebApplicationExtensions
                    .AllowAnyMethod()
                    .AllowAnyHeader();
         }));
+    }
+
+    internal static void ConfigureAmazonS3(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddDefaultAWSOptions(configuration.GetAWSOptions());
+        services.AddAWSService<IAmazonS3>();
     }
 }

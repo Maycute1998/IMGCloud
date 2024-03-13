@@ -12,7 +12,7 @@ public class RepositoryBase<TEntity, TKey> : IRepositoryBase<TEntity, TKey>
     protected readonly IUnitOfWork unitOfWork;
     private bool disposed = false;
 
-    protected RepositoryBase(ImgCloudContext dbContext, IUnitOfWork unitOfWork)
+    public RepositoryBase(ImgCloudContext dbContext, IUnitOfWork unitOfWork)
     {
         this.dbContext = dbContext;
         this.unitOfWork = unitOfWork;

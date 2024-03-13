@@ -4,8 +4,8 @@ namespace IMGCloud.Infrastructure.Repositories;
 
 public sealed class UnitOfWork : IUnitOfWork
 {
-    private readonly DbContext dbContext;
-    public UnitOfWork(DbContext dbContext)
+    private readonly ImgCloudContext dbContext;
+    public UnitOfWork(ImgCloudContext dbContext)
     {
         this.dbContext = dbContext;
     }
