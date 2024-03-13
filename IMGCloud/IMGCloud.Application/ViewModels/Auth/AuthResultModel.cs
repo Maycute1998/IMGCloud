@@ -34,4 +34,12 @@ namespace IMGCloud.Application.ViewModels.Auth
 
         public string? Message { get; set; }
     }
+
+    public class ExternalAuthVM
+    {
+        public string Provider { get; set; }
+        public string GoogleTokenId { get; set; }
+
+
+    }
 }

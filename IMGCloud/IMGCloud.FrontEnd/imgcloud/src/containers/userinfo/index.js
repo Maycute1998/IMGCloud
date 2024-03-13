@@ -153,8 +153,9 @@ const UserInfo = () => {
                     selectedValue={selectedValue}
                     open={open}
                     onCloseUploadAvatar={handleCloseUploadAvatar}
+                    getPreviewValue={(value) => setImageSrc(value)}
                   />
-                  {/* <img src={preview} alt="Preview" /> */}
+                  <img src={imgSrc} alt="Preview" />
                 </div>
               </div>
             )}

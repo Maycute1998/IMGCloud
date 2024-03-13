@@ -1,11 +1,12 @@
+import Alert from "@mui/material/Alert";
+import { GoogleLogin, useGoogleLogin } from "@react-oauth/google";
 import * as React from "react";
 import { useState } from "react";
-import "./welcome.scss";
-import Alert from "@mui/material/Alert";
-import { login, register } from "../../services/user-service";
-import { Ok, TOKEN_KEY, USER_NAME } from "../../const/constant";
-import { redirect } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import { Ok, TOKEN_KEY, USER_NAME } from "../../const/constant";
+import { register } from "../../services/user-service";
+
+import "./welcome.scss";
 
 // TODO remove, this demo shouldn't need to reset the theme.
 const Welcome = () => {
@@ -39,6 +40,10 @@ const Welcome = () => {
     return <Alert severity="error">{alert.message}</Alert>;
   };
 
+  const login = useGoogleLogin({
+    onSuccess: (credentialResponse) => console.log(credentialResponse),
+  });
+
   return (
     <div class="signin-container">
       {renderAlert()}
@@ -48,17 +53,20 @@ const Welcome = () => {
             <img class="logo-image" src="/img/imgcloud-logo.png" alt="logo" />
           </div>
           <div class="social-icons">
-            <a href="#" class="icon">
+            <GoogleLogin
+              onSuccess={(credentialResponse) => {
+                console.log(credentialResponse);
+              }}
+              onError={() => {
+                console.log("Login Failed");
+              }}
+            />
+            ;
+            <a href="#" class="icon" onClick={() => login()}>
               <i class="fa-brands fa-google-plus-g"></i>
             </a>
             <a href="#" class="icon">
               <i class="fa-brands fa-facebook-f"></i>
-            </a>
-            <a href="#" class="icon">
-              <i class="fa-brands fa-github"></i>
-            </a>
-            <a href="#" class="icon">
-              <i class="fa-brands fa-linkedin-in"></i>
             </a>
           </div>
           <span>or use your email password</span>

@@ -24,6 +24,7 @@ namespace IMGCloud.Application.DependencyInjection
 
         public static void AddServiceApplication(this IServiceCollection services)
         {
+            services.AddScoped<IAuthExternalService, AuthExternalService>();
             services.AddScoped<ICacheService, CacheService>();
             services.AddScoped<IAuthenticationService, AuthenticationService>();
             services.AddScoped<IUserService, UserService>();
