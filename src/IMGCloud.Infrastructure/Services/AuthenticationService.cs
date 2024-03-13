@@ -15,7 +15,6 @@ public class AuthenticationService : IAuthenticationService
     private readonly IUserService _userService;
     private readonly ILogger<AuthenticationService> _logger;
     private readonly ICacheService _redisCache;
-    private readonly IConfiguration _configuration;
     private readonly TokenOptions tokenOptions;
 
     public AuthenticationService(
@@ -28,7 +27,6 @@ public class AuthenticationService : IAuthenticationService
     {
         _logger = logger;
         _userService = userService;
-        _configuration = configuration;
         _redisCache = redisCache;
         this.tokenOptions = tokenOptions;
     }

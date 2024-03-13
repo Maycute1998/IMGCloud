@@ -60,8 +60,8 @@ namespace IMGCloud.Infrastructure.Services
             var activeUser = await _userRepository.GetUserByUserNameAsync(model.UserName!, cancellationToken);
             if (activeUser is not null)
             {
-                var isValidPassword = model.Password?.VerifyPassword(activeUser.Password);
-                if (isValidPassword == true)
+                var isValidPassword = model.Password.VerifyPassword(activeUser.Password);
+                if (isValidPassword)
                 {
                     return true;
                 }
