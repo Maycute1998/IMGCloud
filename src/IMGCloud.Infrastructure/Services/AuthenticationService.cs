@@ -33,9 +33,9 @@ public class AuthenticationService : IAuthenticationService
         this.tokenOptions = tokenOptions;
     }
 
-    private async Task<AuthencationApiResult> SignInAsync(SignInContext model, CancellationToken cancellationToken)
+    private async Task<AuthencationResult> SignInAsync(SignInContext model, CancellationToken cancellationToken)
     {
-        var result = new AuthencationApiResult();
+        var result = new AuthencationResult();
         var tokenBuilder = new JwtTokenBuilder();
         tokenBuilder
                .AddSecurityKey(JwtSecurityKey.Create(this.tokenOptions.SecurityKey))
@@ -149,7 +149,7 @@ public class AuthenticationService : IAuthenticationService
     Task IAuthenticationService.SignUpAsync(CreateUserRequest model, CancellationToken cancellationToken)
     => this.SignUpAsync(model, cancellationToken);
 
-    Task<AuthencationApiResult> IAuthenticationService.SignInAsync(SignInContext model, CancellationToken cancellationToken)
+    Task<AuthencationResult> IAuthenticationService.SignInAsync(SignInContext model, CancellationToken cancellationToken)
     => SignInAsync(model, cancellationToken);
 
     Task IAuthenticationService.SignOutAsync(CancellationToken cancellationToken)

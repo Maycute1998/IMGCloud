@@ -23,9 +23,9 @@ public class AuthController : ControllerBase
     {
         var data = await _authService.SignInAsync(model, cancellationToken);
 
-        return Ok(new ApiResult<AuthencationApiResult>()
+        return Ok(new AuthencationApiResult()
         {
-            Context = data,
+            Token = data.Token,
             IsSucceeded = true
         });
     }
@@ -34,7 +34,7 @@ public class AuthController : ControllerBase
     [Route("register")]
     public async Task<IActionResult> RegisterAsync([FromBody] CreateUserRequest model, CancellationToken cancellationToken = default)
     {
-        await _authService.SignUpAsync(model);
+        await _authService.SignUpAsync(model, cancellationToken);
         return Ok();
     }
 
