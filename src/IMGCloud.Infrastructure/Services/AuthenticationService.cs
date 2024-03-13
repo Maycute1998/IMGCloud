@@ -1,7 +1,8 @@
 ﻿using IMGCloud.Domain.Cores;
+using IMGCloud.Domain.Options;
+using IMGCloud.Infrastructure.Builders;
 using IMGCloud.Infrastructure.Context;
 using IMGCloud.Infrastructure.Requests;
-using IMGCloud.Utilities.TokenBuilder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
@@ -15,18 +16,21 @@ public class AuthenticationService : IAuthenticationService
     private readonly ILogger<AuthenticationService> _logger;
     private readonly ICacheService _redisCache;
     private readonly IConfiguration _configuration;
+    private readonly TokenOptions tokenOptions;
 
     public AuthenticationService(
           ILogger<AuthenticationService> logger
         , IUserService userService
         , IConfiguration configuration
         , IStringLocalizer<AuthenticationService> stringLocalizer
-        , ICacheService redisCache)
+        , ICacheService redisCache
+        , TokenOptions tokenOptions)
     {
         _logger = logger;
         _userService = userService;
         _configuration = configuration;
         _redisCache = redisCache;
+        this.tokenOptions = tokenOptions;
     }
 
     private async Task<AuthencationApiResult> SignInAsync(SignInContext model, CancellationToken cancellationToken)
@@ -34,13 +38,13 @@ public class AuthenticationService : IAuthenticationService
         var result = new AuthencationApiResult();
         var tokenBuilder = new JwtTokenBuilder();
         tokenBuilder
-               .AddSecurityKey(JwtSecurityKey.Create(_configuration["TokenConfigs:SecurityKey"]))
+               .AddSecurityKey(JwtSecurityKey.Create(this.tokenOptions.SecurityKey))
                .AddSubject(model.UserName)
-               .AddIssuer(_configuration["TokenConfigs:Issuer"])
-               .AddAudience(_configuration["TokenConfigs:Audience"])
-               .AddClaim(_configuration["TokenConfigs:ClaimKey"], _configuration["TokenConfigs:ClaimValue"])
+               .AddIssuer(this.tokenOptions.Issuer)
+               .AddAudience(this.tokenOptions.Audience)
+               .AddClaim(this.tokenOptions.ClaimKey, this.tokenOptions.ClaimValue)
                .AddUserName(model.UserName)
-               .AddExpiryDate(int.Parse(_configuration["TokenConfigs:Expiry"]));
+               .AddExpiryDate(this.tokenOptions.Expiry);
         var isExistUser = await _userService.IsActiveUserAsync(model, cancellationToken);
         if (isExistUser)
         {
@@ -49,7 +53,7 @@ public class AuthenticationService : IAuthenticationService
             if (!string.IsNullOrWhiteSpace(existedUserToken))
             {
 
-                var oldclaimsData = tokenBuilder.GetPrincipalFromExpiredToken(_configuration, existedUserToken);
+                var oldclaimsData = tokenBuilder.GetPrincipalFromExpiredToken(tokenOptions, existedUserToken);
                 if (oldclaimsData is not null)
                 {
                     var expiryDate = long.Parse(oldclaimsData.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Exp).Value);
@@ -79,7 +83,7 @@ public class AuthenticationService : IAuthenticationService
             else
             {
                 result.Token = tokenBuilder.GenerateAccessToken(true).Value;
-                var newClaimsData = tokenBuilder.GetPrincipalFromExpiredToken(_configuration, result.Token);
+                var newClaimsData = tokenBuilder.GetPrincipalFromExpiredToken(tokenOptions, result.Token);
                 var expiryDate = long.Parse(newClaimsData.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Exp).Value);
                 var expDate = UnixTimeStampToDateTime(expiryDate);
 

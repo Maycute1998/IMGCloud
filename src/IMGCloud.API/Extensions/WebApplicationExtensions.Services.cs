@@ -1,4 +1,5 @@
-﻿using IMGCloud.Infrastructure;
+﻿using IMGCloud.Domain.Options;
+using IMGCloud.Infrastructure;
 using IMGCloud.Utilities.Languages;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -44,6 +45,21 @@ public static partial class WebApplicationExtensions
     internal static void AddServiceApplication(this IServiceCollection services)
     {
 
+    }
+
+    internal static void AddOptions(this IServiceCollection services, IConfiguration configuration)
+    {
+        var amazonBulket = configuration.GetSection(nameof(AmazonBulketOptions)).Get<AmazonBulketOptions>();
+        ArgumentNullException.ThrowIfNull(amazonBulket);
+        services.AddSingleton(amazonBulket);
+
+        var jwtOptions = configuration.GetSection(nameof(JwtOptions)).Get<JwtOptions>();
+        ArgumentNullException.ThrowIfNull(jwtOptions);
+        services.AddSingleton(jwtOptions);
+
+        var tokenOptions = configuration.GetSection(nameof(TokenOptions)).Get<TokenOptions>();
+        ArgumentNullException.ThrowIfNull(tokenOptions);
+        services.AddSingleton(tokenOptions);
     }
 
     internal static void ConfigureJwt(this IServiceCollection services, IConfiguration configuration)

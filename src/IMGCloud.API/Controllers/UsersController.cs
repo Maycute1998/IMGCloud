@@ -7,7 +7,7 @@ namespace IMGCloud.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class UsersController : ControllerBase
+public sealed class UsersController : ControllerBase
 {
     private readonly IUserService _userService;
 
@@ -17,9 +17,9 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetUserByIdAsync(string userName)
+    public async Task<IActionResult> GetUserByIdAsync(string userName, CancellationToken cancellationToken = default)
     {
-        var data = await _userService.GetUserDetailByUserNameAsync(userName);
+        var data = await _userService.GetUserDetailByUserNameAsync(userName, cancellationToken);
         return Ok(new ApiResult<UserDetail>()
         {
             Context = data,
