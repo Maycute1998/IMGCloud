@@ -8,7 +8,7 @@ namespace IMGCloud.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AuthController : BaseController
+    public class AuthController : ControllerBase
     {
         private readonly IAuthenticationService _authService;
 
