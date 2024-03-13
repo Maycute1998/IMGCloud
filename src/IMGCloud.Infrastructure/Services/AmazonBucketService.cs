@@ -25,7 +25,7 @@ public sealed class AmazonBucketService : IAmazonBucketService
             return;
         }
 
-        await _s3Client.DeleteObjectAsync(this.bulketOptions.BucketName, key, cancellationToken);
+        await _s3Client.DeleteObjectAsync(this.bulketOptions.AwsConfig!.BucketName, key, cancellationToken);
     }
 
     private async Task<IEnumerable<S3ObjectContext>> GetAllAsync(CancellationToken cancellationToken)
@@ -35,15 +35,15 @@ public sealed class AmazonBucketService : IAmazonBucketService
         {
             var request = new ListObjectsV2Request()
             {
-                BucketName = this.bulketOptions.BucketName,
-                Prefix = this.bulketOptions.Prefix
+                BucketName = this.bulketOptions.AwsConfig!.BucketName,
+                Prefix = this.bulketOptions.AwsConfig.Prefix
             };
             var result = await _s3Client.ListObjectsV2Async(request, cancellationToken);
             return result.S3Objects.Select(s =>
             {
                 var urlRequest = new GetPreSignedUrlRequest()
                 {
-                    BucketName = this.bulketOptions.BucketName,
+                    BucketName = this.bulketOptions.AwsConfig.BucketName,
                     Key = s.Key,
                     Expires = DateTime.UtcNow.AddMinutes(1)
                 };
@@ -63,7 +63,7 @@ public sealed class AmazonBucketService : IAmazonBucketService
         var isExistBucket = await this.IsExistedAsync();
         if (!isExistBucket)
         {
-            return await _s3Client.GetObjectAsync(this.bulketOptions.BucketName, key, cancellationToken);
+            return await _s3Client.GetObjectAsync(this.bulketOptions.AwsConfig!.BucketName, key, cancellationToken);
         }
 
         return default;
@@ -71,7 +71,7 @@ public sealed class AmazonBucketService : IAmazonBucketService
 
     private Task<bool> IsExistedAsync()
     {
-        return AmazonS3Util.DoesS3BucketExistV2Async(_s3Client, this.bulketOptions.BucketName);
+        return AmazonS3Util.DoesS3BucketExistV2Async(_s3Client, this.bulketOptions.AwsConfig.BucketName);
     }
 
     private async Task<string> UploadFileAsync(IFormFile file, CancellationToken cancellationToken)
@@ -79,10 +79,10 @@ public sealed class AmazonBucketService : IAmazonBucketService
         var isExistBucket = await IsExistedAsync();
         if (!isExistBucket)
         {
-            var prefix = this.bulketOptions.Prefix;
+            var prefix = this.bulketOptions.AwsConfig!.Prefix;
             var request = new PutObjectRequest()
             {
-                BucketName = this.bulketOptions.BucketName,
+                BucketName = this.bulketOptions.AwsConfig!.BucketName,
                 Key = string.IsNullOrEmpty(prefix) ? file.FileName : $"{prefix.TrimEnd('/')}/{file.FileName}",
                 InputStream = file.OpenReadStream()
             };

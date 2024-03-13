@@ -1,8 +1,5 @@
-﻿using Amazon.S3;
-using Amazon.S3.Model;
-using IMGCloud.Infrastructure.Services;
+﻿using IMGCloud.Infrastructure.Services;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading;
 
 namespace IMGCloud.API.Controllers
 {
