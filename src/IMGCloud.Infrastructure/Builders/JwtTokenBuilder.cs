@@ -122,14 +122,10 @@ public sealed class JwtTokenBuilder
         var signingKey = tokenOptions.SecurityKey;
         var tokenValidationParameters = new TokenValidationParameters
         {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ValidateLifetime = false,
             ValidateIssuerSigningKey = true,
-            SaveSigninToken = true,
-
-            ValidIssuer = validIssuer,
-            ValidAudience = validAudience,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(signingKey))
         };
         var tokenHandler = new JwtSecurityTokenHandler();

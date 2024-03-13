@@ -16,6 +16,8 @@ namespace IMGCloud.Infrastructure.Services
         private readonly IUserTokenRepository _userTokenRepository;
         private readonly IUserDetailRepository _userInfoRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IStringLocalizer<UserService> _stringLocalizer;
+        private readonly string className = typeof(UserRepository).FullName ?? string.Empty;
 
         public string? GetCurrentUserName
         {
@@ -42,22 +44,29 @@ namespace IMGCloud.Infrastructure.Services
             _userTokenRepository = userTokenRepository;
             _userInfoRepository = userInfoRepository;
             _httpContextAccessor = httpContextAccessor;
+            _stringLocalizer = stringLocalizer;
         }
         private async Task CreateUserAsync(CreateUserRequest model, CancellationToken cancellationToken)
         {
-            if (!(await _userRepository.IsExitsUserNameAsync(model.UserName!, cancellationToken))
-                || !(await _userRepository.IsExitsUserEmailAsync(model.Email, cancellationToken)))
+            if (await _userRepository.IsExitsUserNameAsync(model.UserName!, cancellationToken)
+                || await _userRepository.IsExitsUserEmailAsync(model.Email, cancellationToken))
             {
-                return;
+                string msg = string.Format(_stringLocalizer["emailAlreadyExits"].ToString(), model.UserName);
+                _logger.LogError($"Method [{nameof(CreateUserAsync)}] {Environment.NewLine} Error: {msg}");
+            }
+            else
+            {
+                await _userRepository.CreateUserAsync(model, cancellationToken);
+                string msg = _stringLocalizer["userCreated"].ToString();
+                _logger.LogError($"Method [{nameof(CreateUserAsync)}] {msg}");
             }
 
-            await _userRepository.CreateUserAsync(model, cancellationToken);
         }
 
         public async Task<bool> IsActiveUserAsync(SignInContext model, CancellationToken cancellationToken)
         {
 
-            var activeUser = await _userRepository.GetUserByUserNameAsync(model.UserName!, cancellationToken);
+            var activeUser = await _userRepository.GetUserByUserNameAsync(model.UserName!);
             if (activeUser is not null)
             {
                 var isValidPassword = model.Password.VerifyPassword(activeUser.Password);
@@ -73,6 +82,30 @@ namespace IMGCloud.Infrastructure.Services
 
             return false;
         }
+
+        public async Task<bool> IsExistEmailAsync(string email)
+        {
+            try
+            {
+                var user = await _userRepository.IsExitsUserEmailAsync(email);
+                if (user)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Method [{nameof(IsExistEmailAsync)}] {Environment.NewLine} Error: {ex.Message}");
+            }
+            return false;
+        }
+
+        private Task<bool> IsExistEmailAsync(string email, CancellationToken cancellationToken)
+        => this.IsExistEmailAsync(email, cancellationToken);
 
         private Task<int> GetUserIdByUserNameAsync(string userName, CancellationToken cancellationToken)
         => _userRepository.GetUserIdByUserNameAsync(userName, cancellationToken);
@@ -121,5 +154,7 @@ namespace IMGCloud.Infrastructure.Services
 
         Task<UserDetail?> IUserService.GetUserDetailByUserNameAsync(string userName, CancellationToken cancellationToken)
         => this.GetUserDetailByUserNameAsync(userName, cancellationToken);
+
+        
     }
 }

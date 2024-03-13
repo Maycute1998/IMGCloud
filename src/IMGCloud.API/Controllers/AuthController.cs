@@ -35,7 +35,10 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> RegisterAsync([FromBody] CreateUserRequest model, CancellationToken cancellationToken = default)
     {
         await _authService.SignUpAsync(model, cancellationToken);
-        return Ok();
+        return Ok(new AuthencationApiResult()
+        {
+            IsSucceeded = true,
+        });
     }
 
 

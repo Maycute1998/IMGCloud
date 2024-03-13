@@ -52,12 +52,11 @@ public class AuthenticationService : IAuthenticationService
             {
 
                 var oldclaimsData = tokenBuilder.GetPrincipalFromExpiredToken(tokenOptions, existedUserToken);
+                var expiryDate = long.Parse(oldclaimsData.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Exp).Value);
+                var expDate = UnixTimeStampToDateTime(expiryDate);
+
                 if (oldclaimsData is not null)
                 {
-                    var expiryDate = long.Parse(oldclaimsData.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Exp).Value);
-
-                    var expDate = UnixTimeStampToDateTime(expiryDate);
-
                     var existedToken = IsExistedTokenExpired(existedUserToken, expDate);
                     // Case A: User is existed and token is not expired
                     if (!existedToken)
@@ -66,17 +65,13 @@ public class AuthenticationService : IAuthenticationService
 
                         StoreToken(model.UserName, existedUserToken, expDate);
                     }
-                    //Case B: User is not existed or token is expired
-                    else
-                    {
-                        result.Token = tokenBuilder.GenerateAccessToken(true).Value;
-
-                        // Genarate new user token and store to database
-                        var userToken = tokenBuilder.GenerateAccessToken(true).Value;
-                        StoreToken(model.UserName, userToken, expDate);
-                    }
                 }
-                else { _logger.LogError($"{nameof(SignInAsync)} Error: oldclaimsData is null"); }
+                else 
+                {
+                    result.Token = tokenBuilder.GenerateAccessToken(true).Value;
+                    // Store new token to database
+                    StoreToken(model.UserName, result.Token, expDate);
+                }
             }
             else
             {

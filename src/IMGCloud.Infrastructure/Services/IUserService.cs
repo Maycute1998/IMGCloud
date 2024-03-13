@@ -13,4 +13,5 @@ public interface IUserService
     Task StoreTokenAsync(UserTokenContext context, CancellationToken cancellationToken = default);
     Task RemoveTokenAsync(CancellationToken cancellationToken = default);
     Task<UserDetail?> GetUserDetailByUserNameAsync(string userName, CancellationToken cancellationToken = default);
+    Task<bool> IsExistEmailAsync(string email);
 }
