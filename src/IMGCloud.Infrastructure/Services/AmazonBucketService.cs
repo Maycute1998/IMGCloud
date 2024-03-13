@@ -31,7 +31,7 @@ public sealed class AmazonBucketService : IAmazonBucketService
     private async Task<IEnumerable<S3ObjectContext>> GetAllAsync(CancellationToken cancellationToken)
     {
         var bucketExists = await this.IsExistedAsync();
-        if (!bucketExists)
+        if (bucketExists)
         {
             var request = new ListObjectsV2Request()
             {
@@ -77,7 +77,7 @@ public sealed class AmazonBucketService : IAmazonBucketService
     private async Task<string> UploadFileAsync(IFormFile file, CancellationToken cancellationToken)
     {
         var isExistBucket = await IsExistedAsync();
-        if (!isExistBucket)
+        if (isExistBucket)
         {
             var prefix = this.bulketOptions.Prefix;
             var request = new PutObjectRequest()

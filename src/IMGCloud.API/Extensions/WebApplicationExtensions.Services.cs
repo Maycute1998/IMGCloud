@@ -1,4 +1,7 @@
-﻿using Amazon.S3;
+﻿using Amazon;
+using Amazon.Extensions.NETCore.Setup;
+using Amazon.Runtime;
+using Amazon.S3;
 using IMGCloud.Domain.Options;
 using IMGCloud.Infrastructure;
 using IMGCloud.Infrastructure.Repositories;
@@ -62,7 +65,7 @@ public static partial class WebApplicationExtensions
         services.AddScoped<IPostService, PostService>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IAuthenticationService, AuthenticationService>();
-        services.AddScoped<IAuthExternalService, AuthExternalService>();
+        services.AddScoped<IGoogleService, GoogleService>();
         services.AddScoped<ICacheService, CacheService>();
         services.AddScoped<IAmazonBucketService, AmazonBucketService>();
     }
@@ -80,6 +83,10 @@ public static partial class WebApplicationExtensions
         var tokenOptions = configuration.GetSection(nameof(TokenOptions)).Get<TokenOptions>();
         ArgumentNullException.ThrowIfNull(tokenOptions);
         services.AddSingleton(tokenOptions);
+
+        var googleAuthenticationOptions = configuration.GetSection(nameof(GoogleAuthenticationOptions)).Get<GoogleAuthenticationOptions>();
+        ArgumentNullException.ThrowIfNull(googleAuthenticationOptions);
+        services.AddSingleton(googleAuthenticationOptions);
     }
 
     internal static void ConfigureJwt(this IServiceCollection services, IConfiguration configuration)
@@ -163,7 +170,13 @@ public static partial class WebApplicationExtensions
 
     internal static void ConfigureAmazonS3(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddDefaultAWSOptions(configuration.GetAWSOptions());
+        var amazonS3Options = configuration.GetSection(nameof(AmazonBulketOptions)).Get<AmazonBulketOptions>();
+        var awsOptions = new AWSOptions
+        {
+            Credentials = new BasicAWSCredentials(amazonS3Options.AccessKey, amazonS3Options.SecretAccessKey),
+            Region = RegionEndpoint.APSoutheast2
+        };
+        services.AddDefaultAWSOptions(awsOptions);
         services.AddAWSService<IAmazonS3>();
     }
 }
