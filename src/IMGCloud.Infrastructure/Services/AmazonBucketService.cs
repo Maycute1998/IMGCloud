@@ -25,7 +25,7 @@ public sealed class AmazonBucketService : IAmazonBucketService
             return;
         }
 
-        await _s3Client.DeleteObjectAsync(this.bulketOptions.BucketName, key);
+        await _s3Client.DeleteObjectAsync(this.bulketOptions.BucketName, key, cancellationToken);
     }
 
     private async Task<IEnumerable<S3ObjectContext>> GetAllAsync(CancellationToken cancellationToken)
