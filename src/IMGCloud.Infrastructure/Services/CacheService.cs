@@ -1,46 +1,40 @@
 ﻿using Newtonsoft.Json;
 using IMGCloud.Utilities.RedisConfig;
 
-namespace IMGCloud.Infrastructure.Services
+namespace IMGCloud.Infrastructure.Services;
+
+public sealed class CacheService : ICacheService
 {
-    public class CacheService : ICacheService
+    private readonly StackExchange.Redis.IDatabase _db;
+    public CacheService()
     {
-        private StackExchange.Redis.IDatabase _db;
-        public CacheService()
-        {
-            ConfigureRedis();
-        }
+        _db = ConnectionHelper.Connection.GetDatabase();
+    }
 
-        private void ConfigureRedis()
+    public T? GetData<T>(string key)
+    {
+        var value = _db.StringGet(key);
+        if (!string.IsNullOrWhiteSpace(value))
         {
-            _db = ConnectionHelper.Connection.GetDatabase();
+            return JsonConvert.DeserializeObject<T>(value!);
         }
+        return default;
+    }
 
-        public T GetData<T>(string key)
-        {
-            var value = _db.StringGet(key);
-            if (!string.IsNullOrEmpty(value))
-            {
-                return JsonConvert.DeserializeObject<T>(value);
-            }
-            return default;
-        }
+    public bool SetData<T>(string key, T value, DateTimeOffset expirationTime)
+    {
+        TimeSpan expiryTime = expirationTime.DateTime.Subtract(DateTime.Now);
+        var isSet = _db.StringSet(key, JsonConvert.SerializeObject(value), expiryTime);
+        return isSet;
+    }
 
-        public bool SetData<T>(string key, T value, DateTimeOffset expirationTime)
+    public object RemoveData(string key)
+    {
+        bool _isKeyExist = _db.KeyExists(key);
+        if (_isKeyExist)
         {
-            TimeSpan expiryTime = expirationTime.DateTime.Subtract(DateTime.Now);
-            var isSet = _db.StringSet(key, JsonConvert.SerializeObject(value), expiryTime);
-            return isSet;
+            return _db.KeyDelete(key);
         }
-
-        public object RemoveData(string key)
-        {
-            bool _isKeyExist = _db.KeyExists(key);
-            if (_isKeyExist == true)
-            {
-                return _db.KeyDelete(key);
-            }
-            return false;
-        }
+        return false;
     }
 }

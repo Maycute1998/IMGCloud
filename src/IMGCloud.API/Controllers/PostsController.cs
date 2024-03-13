@@ -1,20 +1,18 @@
-﻿using IMGCloud.Application.Interfaces;
-using IMGCloud.Domain.Models;
+﻿using IMGCloud.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IMGCloud.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class PostController : BaseController
+    public class PostsController : BaseController
     {
         private readonly IPostService _postService;
 
 
-        public PostController(IPostService postService)
+        public PostsController(IPostService postService)
         {
             _postService = postService;
         }

@@ -53,7 +53,7 @@ public sealed class UserRepository : RepositoryBase<User, int>, IUserRepository
     => this.CreateUserAsync(model, cancellationToken);
     Task<User?> IUserRepository.GetUserByUserNameAsync(string userName, CancellationToken cancellationToken)
     => this.GetUserByUserNameAsync(userName, cancellationToken);
-    Task<int> IUserRepository.GetUserIdAsync(string userName, CancellationToken cancellationToken)
+    Task<int> IUserRepository.GetUserIdByUserNameAsync(string userName, CancellationToken cancellationToken)
     => this.GetUserIdAsync(userName, cancellationToken);
     Task<bool> IUserRepository.IsActiveUserAsync(string userName, CancellationToken cancellationToken)
     => this.IsActiveUserAsync(userName, cancellationToken);

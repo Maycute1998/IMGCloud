@@ -28,7 +28,7 @@ public sealed class UserTokenRepository : RepositoryBase<UserToken, int>, IUserT
         await this.SaveChangesAsync(cancellationToken);
     }
 
-    private async Task StoreToken(TokenContext context, CancellationToken cancellationToken)
+    private async Task StoreToken(UserTokenContext context, CancellationToken cancellationToken)
     {
         var user = await dbContext.Users.Where(x => x.UserName.ToLower() == context.UserName.ToLower()).FirstOrDefaultAsync(cancellationToken);
         if (user is null)
@@ -53,6 +53,6 @@ public sealed class UserTokenRepository : RepositoryBase<UserToken, int>, IUserT
     => this.GetExistedTokenAsync(userId, cancellationToken);
     Task IUserTokenRepository.RemoveTokenAsync(int userId, CancellationToken cancellationToken)
     => this.RemoveTokenAsync(userId, cancellationToken);
-    Task IUserTokenRepository.StoreToken(TokenContext context, CancellationToken cancellationToken)
+    Task IUserTokenRepository.StoreTokenAsync(UserTokenContext context, CancellationToken cancellationToken)
     => this.StoreToken(context, cancellationToken);
 }

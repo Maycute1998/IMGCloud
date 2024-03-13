@@ -1,5 +1,6 @@
 ﻿using IMGCloud.Domain.Cores;
 using IMGCloud.Infrastructure.Context;
+using IMGCloud.Infrastructure.Requests;
 using IMGCloud.Utilities.TokenBuilder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Localization;
@@ -12,7 +13,6 @@ public class AuthenticationService : IAuthenticationService
 {
     private readonly IUserService _userService;
     private readonly ILogger<AuthenticationService> _logger;
-    private readonly IStringLocalizer<AuthenticationService> _stringLocalizer;
     private readonly ICacheService _redisCache;
     private readonly IConfiguration _configuration;
 
@@ -26,13 +26,12 @@ public class AuthenticationService : IAuthenticationService
         _logger = logger;
         _userService = userService;
         _configuration = configuration;
-        _stringLocalizer = stringLocalizer;
         _redisCache = redisCache;
     }
 
-    public async Task<AuthencationApiResult<string>> SignInAsync(SigInVM model)
+    private async Task<AuthencationApiResult> SignInAsync(SignInContext model, CancellationToken cancellationToken)
     {
-        var result = new AuthencationApiResult<string>();
+        var result = new AuthencationApiResult();
         var tokenBuilder = new JwtTokenBuilder();
         tokenBuilder
                .AddSecurityKey(JwtSecurityKey.Create(_configuration["TokenConfigs:SecurityKey"]))
@@ -42,96 +41,69 @@ public class AuthenticationService : IAuthenticationService
                .AddClaim(_configuration["TokenConfigs:ClaimKey"], _configuration["TokenConfigs:ClaimValue"])
                .AddUserName(model.UserName)
                .AddExpiryDate(int.Parse(_configuration["TokenConfigs:Expiry"]));
-        try
+        var isExistUser = await _userService.IsActiveUserAsync(model, cancellationToken);
+        if (isExistUser)
         {
-            var isExistUser = await _userService.IsActiveUserAsync(model);
-            if (isExistUser is not null)
+            var userId = await _userService.GetUserIdByUserNameAsync(model.UserName, cancellationToken);
+            var existedUserToken = await _userService.GetExistedTokenAsync(userId, cancellationToken);
+            if (!string.IsNullOrWhiteSpace(existedUserToken))
             {
-                result.Message = isExistUser.Message;
-                var userId = _userService.GetUserId(model.UserName);
-                if (userId != 0)
+
+                var oldclaimsData = tokenBuilder.GetPrincipalFromExpiredToken(_configuration, existedUserToken);
+                if (oldclaimsData is not null)
                 {
-                    var existedUserToken = _userService.GetExistedTokenFromDatabase(userId);
-                    if (!string.IsNullOrEmpty(existedUserToken))
+                    var expiryDate = long.Parse(oldclaimsData.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Exp).Value);
+
+                    var expDate = UnixTimeStampToDateTime(expiryDate);
+
+                    var existedToken = IsExistedTokenExpired(existedUserToken, expDate);
+                    // Case A: User is existed and token is not expired
+                    if (!existedToken)
                     {
+                        result.Token = existedUserToken;
 
-                        var oldclaimsData = tokenBuilder.GetPrincipalFromExpiredToken(_configuration, existedUserToken);
-                        if (oldclaimsData is not null)
-                        {
-                            var expiryDate = long.Parse(oldclaimsData.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Exp).Value);
-
-                            var expDate = UnixTimeStampToDateTime(expiryDate);
-
-                            var existedToken = IsExistedTokenExpired(existedUserToken, expDate);
-                            // Case A: User is existed and token is not expired
-                            if (!existedToken)
-                            {
-                                result.Context = existedUserToken;
-                                result.IsSucceeded = true;
-
-                                StoreToken(model.UserName, existedUserToken, expDate);
-                            }
-                            //Case B: User is not existed or token is expired
-                            else
-                            {
-                                result.Context = tokenBuilder.GenerateAccessToken(true).Value;
-                                result.IsSucceeded = true;
-
-                                // Genarate new user token and store to database
-                                var userToken = tokenBuilder.GenerateAccessToken(true).Value;
-                                StoreToken(model.UserName, userToken, expDate);
-                            }
-                        }
-                        else { _logger.LogError($"{nameof(SignInAsync)} Error: oldclaimsData is null"); }
+                        StoreToken(model.UserName, existedUserToken, expDate);
                     }
+                    //Case B: User is not existed or token is expired
                     else
                     {
-                        result.Context = tokenBuilder.GenerateAccessToken(true).Value;
-                        var newClaimsData = tokenBuilder.GetPrincipalFromExpiredToken(_configuration, result.Context);
-                        var expiryDate = long.Parse(newClaimsData.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Exp).Value);
-                        var expDate = UnixTimeStampToDateTime(expiryDate);
+                        result.Token = tokenBuilder.GenerateAccessToken(true).Value;
 
-                        StoreToken(model.UserName, result.Context, expDate);
-                        result.IsSucceeded = true;
+                        // Genarate new user token and store to database
+                        var userToken = tokenBuilder.GenerateAccessToken(true).Value;
+                        StoreToken(model.UserName, userToken, expDate);
                     }
                 }
+                else { _logger.LogError($"{nameof(SignInAsync)} Error: oldclaimsData is null"); }
             }
-        }
-        catch (Exception ex)
-        {
-            result.Message = ex.Message;
-            result.IsSucceeded = false;
-            _logger.LogError($"Sigin {nameof(SignInAsync)}, Error: {_stringLocalizer["userNotFound"]}");
+            else
+            {
+                result.Token = tokenBuilder.GenerateAccessToken(true).Value;
+                var newClaimsData = tokenBuilder.GetPrincipalFromExpiredToken(_configuration, result.Token);
+                var expiryDate = long.Parse(newClaimsData.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Exp).Value);
+                var expDate = UnixTimeStampToDateTime(expiryDate);
+
+                StoreToken(model.UserName, result.Token, expDate);
+
+            }
         }
         return result;
     }
 
-    public async Task<ApiResult> SignOutAsync()
-    {
-        var res = new ApiResult();
-        var data = _userService.RemveToken();
-        res.IsSucceeded = data.Status;
-        res.Message = data.Message;
-        return res;
-    }
+    private Task SignOutAsync(CancellationToken cancellationToken)
+    => _userService.RemoveTokenAsync(cancellationToken);
 
-    public async Task<ResponeVM> SignUpAsync(UserVM model)
-    {
-        return await _userService.CreateUserAsync(model);
-    }
+    private Task SignUpAsync(CreateUserRequest model, CancellationToken cancellationToken)
+    => _userService.CreateUserAsync(model, cancellationToken);
 
     private bool IsExistedTokenExpired(string existedUserToken, DateTime expDate)
     {
         bool isExistedTokenExpired = false;
         try
         {
-            if (!string.IsNullOrEmpty(existedUserToken))
+            if (!string.IsNullOrWhiteSpace(existedUserToken) && expDate < DateTime.UtcNow)
             {
-                // Check the token we got if it is not expired
-                if (expDate < DateTime.UtcNow)
-                {
-                    isExistedTokenExpired = true;
-                }
+                isExistedTokenExpired = true;
             }
         }
         catch (Exception ex)
@@ -144,7 +116,7 @@ public class AuthenticationService : IAuthenticationService
     private DateTime UnixTimeStampToDateTime(double unixTimeStamp)
     {
         // Unix timestamp is seconds past epoch
-        System.DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
+        System.DateTime dtDateTime = DateTime.UnixEpoch;
         dtDateTime = dtDateTime.AddSeconds(unixTimeStamp).ToUniversalTime();
         return dtDateTime;
     }
@@ -169,5 +141,14 @@ public class AuthenticationService : IAuthenticationService
         };
         _redisCache.SetData(keyRedis, redisData, expireDate);
     }
+
+    Task IAuthenticationService.SignUpAsync(CreateUserRequest model, CancellationToken cancellationToken)
+    => this.SignUpAsync(model, cancellationToken);
+
+    Task<AuthencationApiResult> IAuthenticationService.SignInAsync(SignInContext model, CancellationToken cancellationToken)
+    => SignInAsync(model, cancellationToken);
+
+    Task IAuthenticationService.SignOutAsync(CancellationToken cancellationToken)
+    => this.SignOutAsync(cancellationToken);
 }
 

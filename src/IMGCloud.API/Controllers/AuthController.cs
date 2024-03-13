@@ -1,14 +1,12 @@
-﻿using IMGCloud.Application.Implement.Auth;
-using IMGCloud.Domain.Models;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using System.Net;
-using IMGCloud.API.ViewModels;
-using IMGCloud.Application.Interfaces.Auth;
+﻿using Microsoft.AspNetCore.Mvc;
+using IMGCloud.Infrastructure.Requests;
+using IMGCloud.Infrastructure.Services;
+using IMGCloud.Infrastructure.Context;
+using IMGCloud.Domain.Cores;
 
 namespace IMGCloud.API.Controllers
 {
-    [Route("api")]
+    [Route("api/[controller]")]
     [ApiController]
     public class AuthController : BaseController
     {
@@ -21,26 +19,25 @@ namespace IMGCloud.API.Controllers
 
         [HttpPost]
         [Route("login")]
-        public async Task<IActionResult> SiginAsync([FromBody] SigInVM model)
+        public async Task<IActionResult> SigInAsync([FromBody] SignInContext model)
         {
             var data = await _authService.SignInAsync(model);
-            
-            return ExecuteResult(new
+
+            return Ok(new ApiResult<AuthencationApiResult>()
             {
-                data.Status,
-                data.Message,
-                data.Token
+                Context = data,
+                IsSucceeded = true
             });
         }
 
         [HttpPost]
         [Route("register")]
-        public async Task<IActionResult> RegisterAsync([FromBody] UserVM model)
+        public async Task<IActionResult> RegisterAsync([FromBody] CreateUserRequest model)
         {
-            var data = await _authService.SignUpAsync(model);
-            return ExecuteResult(data.Status, data.Message);
+            await _authService.SignUpAsync(model);
+            return Ok();
         }
 
-        
+
     }
 }

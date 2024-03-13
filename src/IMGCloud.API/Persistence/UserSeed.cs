@@ -1,4 +1,4 @@
-﻿using IMGCloud.Data.Context;
+﻿using IMGCloud.Infrastructure;
 using IMGCloud.Utilities.PasswordHashExtension;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,7 +11,7 @@ public static class UserSeed
         using var scope = app.Services.CreateScope();
 
         using var dbContext = scope.ServiceProvider
-            .GetRequiredService<IMGCloudContext>();
+            .GetRequiredService<ImgCloudContext>();
 
         dbContext.Database.Migrate();
 

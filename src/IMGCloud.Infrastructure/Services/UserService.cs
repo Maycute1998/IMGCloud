@@ -3,17 +3,32 @@ using Microsoft.Extensions.Logging;
 using IMGCloud.Utilities.PasswordHashExtension;
 using Microsoft.AspNetCore.Http;
 using IMGCloud.Infrastructure.Repositories;
+using IMGCloud.Infrastructure.Requests;
+using IMGCloud.Infrastructure.Context;
+using IMGCloud.Domain.Entities;
 
 namespace IMGCloud.Infrastructure.Services
 {
     public class UserService : IUserService
     {
-        private readonly IStringLocalizer<UserService> _stringLocalizer;
         private readonly ILogger<UserService> _logger;
         private readonly IUserRepository _userRepository;
         private readonly IUserTokenRepository _userTokenRepository;
         private readonly IUserDetailRepository _userInfoRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
+
+        public string? GetCurrentUserName
+        {
+            get
+            {
+                if (_httpContextAccessor.HttpContext.User.Identity?.IsAuthenticated == true)
+                {
+                    return _httpContextAccessor.HttpContext.User?.Claims?.FirstOrDefault()?.Subject?.Name;
+                }
+
+                return default;
+            }
+        }
 
         public UserService(ILogger<UserService> logger,
             IStringLocalizer<UserService> stringLocalizer,
@@ -23,133 +38,88 @@ namespace IMGCloud.Infrastructure.Services
             IHttpContextAccessor httpContextAccessor)
         {
             _logger = logger;
-            _stringLocalizer = stringLocalizer;
             _userRepository = userRepository;
             _userTokenRepository = userTokenRepository;
             _userInfoRepository = userInfoRepository;
             _httpContextAccessor = httpContextAccessor;
         }
-        public async Task<ResponeVM> CreateUserAsync(UserVM model)
+        private async Task CreateUserAsync(CreateUserRequest model, CancellationToken cancellationToken)
         {
-            var res = new ResponeVM();
-            try
+            if (!(await _userRepository.IsExitsUserNameAsync(model.UserName!, cancellationToken))
+                || !(await _userRepository.IsExitsUserEmailAsync(model.Email, cancellationToken)))
             {
-                if (await _userRepository.IsExitsUserNameAsync(model.UserName))
+                return;
+            }
+
+            await _userRepository.CreateUserAsync(model, cancellationToken);
+        }
+
+        public async Task<bool> IsActiveUserAsync(SignInContext model, CancellationToken cancellationToken)
+        {
+
+            var activeUser = await _userRepository.GetUserByUserNameAsync(model.UserName!, cancellationToken);
+            if (activeUser is not null)
+            {
+                var isValidPassword = model.Password?.VerifyPassword(activeUser.Password);
+                if (isValidPassword == true)
                 {
-                    res.Message = string.Format(_stringLocalizer["userNameAlreadyExits"].ToString(), model.UserName);
-                }
-                else if (await _userRepository.IsExitsUserEmailAsync(model.Email))
-                {
-                    res.Message = string.Format(_stringLocalizer["emailAlreadyExits"].ToString(), model.UserName);
+                    return true;
                 }
                 else
                 {
-                    await _userRepository.CreateUserAsync(model);
-                    res.Message = _stringLocalizer["userCreated"].ToString();
-                    res.Status = true;
-
+                    return false;
                 }
             }
-            catch (Exception ex)
+
+            return false;
+        }
+
+        private Task<int> GetUserIdByUserNameAsync(string userName, CancellationToken cancellationToken)
+        => _userRepository.GetUserIdByUserNameAsync(userName, cancellationToken);
+
+
+        private Task<string?> GetExistedTokenAsync(int userId, CancellationToken cancellationToken)
+        =>  _userTokenRepository.GetExistedTokenAsync(userId, cancellationToken);
+
+
+        private Task StoreTokenAsync(UserTokenContext context, CancellationToken cancellationToken)
+        =>  _userTokenRepository.StoreTokenAsync(context, cancellationToken);
+
+
+        private async Task RemoveTokenAsync(CancellationToken cancellationToken)
+        {
+            var curentUser = await _userRepository.GetUserByUserNameAsync(GetCurrentUserName, cancellationToken);
+            if (curentUser is null)
             {
-                res.Message = ex.Message;
-                _logger.LogError($"Method [{nameof(CreateUserAsync)}] {Environment.NewLine} Error: {ex.Message}");
+                return;
             }
-            return res;
+
+            await _userTokenRepository.RemoveTokenAsync(curentUser.Id, cancellationToken);
         }
 
-        public async Task<ResponeVM> IsActiveUserAsync(SigInVM model)
-        {
-            var result = new ResponeVM();
-            var activeUser = await _userRepository.GetUserbyUserName(model.UserName);
-            try
-            {
-                if (activeUser is not null)
-                {
-                    var isValidPassword = model.Password.VerifyPassword(activeUser.Password);
-                    if (isValidPassword)
-                    {
-                        result.Status = true;
-                        result.Message = _stringLocalizer["LoginSuccessfully"].ToString();
-                        _logger.LogInformation($"Method {nameof(IsActiveUserAsync)} {result.Message}", result.Message);
-                    }
-                    else
-                    {
-                        result.Message = _stringLocalizer["LoginFailed"];
-                        _logger.LogInformation($"Method {nameof(IsActiveUserAsync)} {Environment.NewLine} Error: {result.Message}");
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                result.Message = ex.Message;
-                _logger.LogError($"Method [{nameof(IsActiveUserAsync)}] {Environment.NewLine} Error: {ex.Message}");
-            }
-            return result;
-        }
+        public Task<UserDetail?> GetUserDetailByUserNameAsync(string userName, CancellationToken cancellationToken)
+        => _userInfoRepository.GetUserDetailbyUserNameAsync(userName, cancellationToken);
 
-        public int GetUserId(string userName)
-        {
-            return _userRepository.GetUserId(userName);
-        }
 
-        public string GetExistedTokenFromDatabase(int userId)
-        {
-            return _userTokenRepository.GetExistedUserTokenFromDB(userId);
-        }
+        Task<int> IUserService.GetUserIdByUserNameAsync(string userName, CancellationToken cancellationToken)
+        => this.GetUserIdByUserNameAsync(userName, cancellationToken);
 
-        public ResponeVM StoreTokenAsync(TokenVM tokenModel)
-        {
-            return _userTokenRepository.StoreToken(tokenModel);
-        }
+        Task<bool> IUserService.IsActiveUserAsync(SignInContext user, CancellationToken cancellationToken)
+        => this.IsActiveUserAsync(user, cancellationToken);
 
-        public string GetCurrentUserName
-        {
-            get
-            {
-                if (_httpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
-                {
-                    return _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault().Subject.Name;
-                }
-                return "Please login";
-            }
-        }
-        public ResponeVM RemveToken()
-        {
-            var curentUserId = _userRepository.GetUserId(GetCurrentUserName);
-            return _userTokenRepository.RemveToken(curentUserId);
-        }
+        Task IUserService.CreateUserAsync(CreateUserRequest model, CancellationToken cancellationToken)
+        => this.CreateUserAsync(model, cancellationToken);
 
-        public async Task<ResponeVM> GetUserInfor(string userName)
-        {
-            var result = new ResponeVM();
-            try
-            {
-                var user = _userRepository.GetUserId(userName);
-                if (user != 0)
-                {
-                    var userInfo = await _userInfoRepository.GetUserInfobyId(user);
+        Task<string?> IUserService.GetExistedTokenAsync(int userId, CancellationToken cancellationToken)
+        => this.GetExistedTokenAsync(userId, cancellationToken);
 
-                    if (userInfo is not null)
-                    {
-                        result.Data = userInfo;
-                        result.Status = true;
-                        result.Message = _stringLocalizer["LoginSuccessfully"].ToString();
-                        _logger.LogInformation($"Method {nameof(GetUserInfor)} {result.Message}", result.Message);
-                    }
-                    else
-                    {
-                        result.Message = _stringLocalizer["userNotFound"];
-                        _logger.LogInformation($"Method {nameof(GetUserInfor)} {Environment.NewLine} Error: {result.Message}");
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                result.Message = ex.Message;
-                _logger.LogError($"Method [{nameof(GetUserInfor)}] {Environment.NewLine} Error: {ex.Message}");
-            }
-            return result;
-        }
+        Task IUserService.StoreTokenAsync(UserTokenContext context, CancellationToken cancellationToken)
+        => this.StoreTokenAsync(context, cancellationToken);
+
+        Task IUserService.RemoveTokenAsync(CancellationToken cancellationToken)
+        => this.RemoveTokenAsync(cancellationToken);
+
+        Task<UserDetail?> IUserService.GetUserDetailByUserNameAsync(string userName, CancellationToken cancellationToken)
+        => this.GetUserDetailByUserNameAsync(userName, cancellationToken);
     }
 }

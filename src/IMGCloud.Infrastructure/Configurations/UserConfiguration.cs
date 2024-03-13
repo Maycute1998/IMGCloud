@@ -9,12 +9,32 @@ public sealed class UserConfiguration : IEntityTypeConfiguration<User>
     public void Configure(EntityTypeBuilder<User> builder)
     {
         builder.ToTable("Users");
-        builder.HasKey(x => x.Id);
-        builder.Property(x => x.Id).UseIdentityColumn();
 
-        builder.Property(u => u.UserName).IsUnicode(false).IsRequired().HasMaxLength(255);
-        builder.Property(u => u.Password).IsUnicode(false).IsRequired().HasMaxLength(255);
-        builder.Property(u => u.Email).IsUnicode(false).IsRequired().HasMaxLength(255);
+        builder.HasKey(x => x.Id);
+
+        builder.Property(x => x.Id)
+            .UseIdentityColumn();
+
+        builder.HasIndex(u => new
+        {
+            u.UserName,
+            u.Email
+        }).IsUnique();
+
+        builder.Property(u => u.UserName)
+            .IsUnicode(false)
+            .IsRequired()
+            .HasMaxLength(255);
+
+        builder.Property(u => u.Password)
+            .IsUnicode(false)
+            .IsRequired()
+            .HasMaxLength(255);
+
+        builder.Property(u => u.Email)
+            .IsUnicode(false)
+            .IsRequired()
+            .HasMaxLength(255);
 
         builder.HasOne(x => x.UserInfos)
             .WithOne(x => x.User)

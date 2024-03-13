@@ -10,4 +10,5 @@ namespace IMGCloud.Infrastructure.Repositories;
 public interface IUserDetailRepository
 {
     Task<UserDetail?> GetUserDetailbyUserIdAsync(int id, CancellationToken cancellationToken = default);
+    Task<UserDetail?> GetUserDetailbyUserNameAsync(string userName, CancellationToken cancellationToken = default);
 }

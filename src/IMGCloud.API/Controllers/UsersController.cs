@@ -1,31 +1,29 @@
-﻿using IMGCloud.Application.Interfaces.Users;
-using Microsoft.AspNetCore.Http;
+﻿using IMGCloud.Domain.Cores;
+using IMGCloud.Domain.Entities;
+using IMGCloud.Infrastructure.Services;
 using Microsoft.AspNetCore.Mvc;
 
-namespace IMGCloud.API.Controllers
+namespace IMGCloud.API.Controllers;
+
+[Route("api/[controller]")]
+[ApiController]
+public class UsersController : BaseController
 {
-    [Route("api/user")]
-    [ApiController]
-    public class UsersController : BaseController
+    private readonly IUserService _userService;
+
+    public UsersController(IUserService userService)
     {
-        private readonly IUserService _userService;
+        _userService = userService;
+    }
 
-        public UsersController(IUserService userService)
+    [HttpGet]
+    public async Task<IActionResult> GetUserByIdAsync(string userName)
+    {
+        var data = await _userService.GetUserDetailByUserNameAsync(userName);
+        return Ok(new ApiResult<UserDetail>()
         {
-            _userService = userService;
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> GetUserByIdAsync(string userName)
-        {
-            var data = await _userService.GetUserInfor(userName);
-
-            return ExecuteResult(new
-            {
-                data.Status,
-                data.Data,
-                data.Message
-            });
-        }
+            Context = data,
+            IsSucceeded = true
+        });
     }
 }

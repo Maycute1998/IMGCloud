@@ -19,7 +19,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\IMGCloud.Application\IMGCloud.Application.csproj" />
     <ProjectReference Include="..\IMGCloud.Domain\IMGCloud.Domain.csproj" />
     <ProjectReference Include="..\IMGCloud.Infrastructure\IMGCloud.Infrastructure.csproj" />
   </ItemGroup>

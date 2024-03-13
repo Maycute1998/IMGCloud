@@ -5,7 +5,7 @@ namespace IMGCloud.Infrastructure.Extensions;
 
 public static class UserTokenExtensions
 {
-    public static UserToken ToUserToken(this TokenContext context, UserToken userToken)
+    public static UserToken ToUserToken(this UserTokenContext context, UserToken userToken)
     => new()
     {
         UserId = userToken.UserId,
@@ -16,7 +16,7 @@ public static class UserTokenExtensions
         CreatedDate = userToken.CreatedDate,
     };
 
-    public static UserToken ToUserToken(this TokenContext context)
+    public static UserToken ToUserToken(this UserTokenContext context)
     => new()
     {
         UserId = context.UserId,

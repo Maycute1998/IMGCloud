@@ -1,9 +1,12 @@
-﻿namespace IMGCloud.Infrastructure.Services
+﻿using IMGCloud.Domain.Cores;
+using IMGCloud.Infrastructure.Context;
+using IMGCloud.Infrastructure.Requests;
+
+namespace IMGCloud.Infrastructure.Services;
+
+public interface IAuthenticationService
 {
-    public interface IAuthenticationService
-    {
-        Task<ResponeVM> SignUpAsync(UserVM model);
-        Task<ResponeAuthVM> SignInAsync(SigInVM model);
-        Task<ResponeVM> SignOutAsync();
-    }
+    Task SignUpAsync(CreateUserRequest model, CancellationToken cancellationToken = default);
+    Task<AuthencationApiResult> SignInAsync(SignInContext model, CancellationToken cancellationToken = default);
+    Task SignOutAsync(CancellationToken cancellationToken = default);
 }

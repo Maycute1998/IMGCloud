@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace IMGCloud.Infrastructure.Context;
 
-public sealed class TokenContext
+public sealed class UserTokenContext
 {
     public int UserId { get; set; }
     public string UserName { get; set; } = string.Empty;
