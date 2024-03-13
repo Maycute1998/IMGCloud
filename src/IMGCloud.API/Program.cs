@@ -1,5 +1,5 @@
-using IMGCloud.API.Persistence;
 using IMGCloud.API.Extensions;
+using IMGCloud.API.Persistence;
 
 try
 {

@@ -1,5 +1,6 @@
 ﻿using IMGCloud.Domain.Cores;
 using IMGCloud.Domain.Entities;
+using IMGCloud.Infrastructure.Requests;
 using IMGCloud.Infrastructure.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,13 +18,21 @@ public sealed class UsersController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetUserByIdAsync(string userName, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> GetUserByIdAsync(int id, CancellationToken cancellationToken = default)
     {
-        var data = await _userService.GetUserDetailByUserNameAsync(userName, cancellationToken);
+        var data = await _userService.GetUserByIdAsync(id, cancellationToken);
         return Ok(new ApiResult<UserDetail>()
         {
             Context = data,
-            IsSucceeded = true
+            IsSucceeded = true,
         });
+    }
+
+    [HttpPost]
+    [Route("create")]
+    public async Task<IActionResult> CreateUserInfoAsync([FromBody]UserDetailsRequest userInfo, CancellationToken cancellationToken = default)
+    {
+        var respone = await _userService.CreateUserInfoAsync(userInfo, cancellationToken);
+        return respone.IsSucceeded ? Ok(new ApiResult<UserDetail>() {Message = respone.Message, IsSucceeded = respone.IsSucceeded }) : BadRequest();
     }
 }

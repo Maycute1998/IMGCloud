@@ -9,11 +9,11 @@ using IMGCloud.Infrastructure.Services;
 using IMGCloud.Utilities.Languages;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Localization;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace IMGCloud.API.Extensions;
 
@@ -87,6 +87,10 @@ public static partial class WebApplicationExtensions
         var googleAuthenticationOptions = configuration.GetSection(nameof(GoogleAuthenticationOptions)).Get<GoogleAuthenticationOptions>();
         ArgumentNullException.ThrowIfNull(googleAuthenticationOptions);
         services.AddSingleton(googleAuthenticationOptions);
+
+        services.AddControllers().AddJsonOptions(x =>
+                x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
+
     }
 
     internal static void ConfigureJwt(this IServiceCollection services, IConfiguration configuration)

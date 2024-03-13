@@ -1,4 +1,5 @@
 ﻿using IMGCloud.Domain.Cores;
+using IMGCloud.Domain.Entities;
 using IMGCloud.Domain.Options;
 using IMGCloud.Infrastructure.Builders;
 using IMGCloud.Infrastructure.Context;
@@ -62,11 +63,14 @@ public class AuthenticationService : IAuthenticationService
                     if (!existedToken)
                     {
                         result.Token = existedUserToken;
-
-                        StoreToken(model.UserName, existedUserToken, expDate);
+                    }
+                    else
+                    {
+                        result.Token = tokenBuilder.GenerateAccessToken(true).Value;
+                        StoreToken(model.UserName, result.Token, expDate);
                     }
                 }
-                else 
+                else
                 {
                     result.Token = tokenBuilder.GenerateAccessToken(true).Value;
                     // Store new token to database
@@ -90,7 +94,7 @@ public class AuthenticationService : IAuthenticationService
     private Task SignOutAsync(CancellationToken cancellationToken)
     => _userService.RemoveTokenAsync(cancellationToken);
 
-    private Task SignUpAsync(CreateUserRequest model, CancellationToken cancellationToken)
+    private Task<ApiResult<User>> SignUpAsync(CreateUserRequest model, CancellationToken cancellationToken)
     => _userService.CreateUserAsync(model, cancellationToken);
 
     private bool IsExistedTokenExpired(string existedUserToken, DateTime expDate)
@@ -120,7 +124,6 @@ public class AuthenticationService : IAuthenticationService
 
     private void StoreToken(string userName, string userToken, DateTime expireDate)
     {
-        var keyRedis = $"redis-{userName}";
         var token = new UserTokenContext()
         {
             UserName = userName,
@@ -129,6 +132,8 @@ public class AuthenticationService : IAuthenticationService
             IsActive = true
         };
         _userService.StoreTokenAsync(token);
+
+        var keyRedis = $"redis-{userName}";
         _redisCache.RemoveData(keyRedis);
         var redisData = new RedisContext()
         {
@@ -139,7 +144,7 @@ public class AuthenticationService : IAuthenticationService
         _redisCache.SetData(keyRedis, redisData, expireDate);
     }
 
-    Task IAuthenticationService.SignUpAsync(CreateUserRequest model, CancellationToken cancellationToken)
+    Task<ApiResult<User>> IAuthenticationService.SignUpAsync(CreateUserRequest model, CancellationToken cancellationToken)
     => this.SignUpAsync(model, cancellationToken);
 
     Task<AuthencationResult> IAuthenticationService.SignInAsync(SignInContext model, CancellationToken cancellationToken)

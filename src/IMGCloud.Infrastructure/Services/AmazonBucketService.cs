@@ -61,7 +61,7 @@ public sealed class AmazonBucketService : IAmazonBucketService
     private async Task<GetObjectResponse?> GetAsync(string key, CancellationToken cancellationToken)
     {
         var isExistBucket = await this.IsExistedAsync();
-        if (!isExistBucket)
+        if (isExistBucket)
         {
             return await _s3Client.GetObjectAsync(this.bulketOptions.BucketName, key, cancellationToken);
         }

@@ -1,8 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using IMGCloud.Domain.Cores;
+using IMGCloud.Domain.Entities;
+using IMGCloud.Infrastructure.Context;
 using IMGCloud.Infrastructure.Requests;
 using IMGCloud.Infrastructure.Services;
-using IMGCloud.Infrastructure.Context;
-using IMGCloud.Domain.Cores;
+using Microsoft.AspNetCore.Mvc;
 
 namespace IMGCloud.API.Controllers;
 
@@ -36,10 +37,11 @@ public class AuthController : ControllerBase
     [Route("register")]
     public async Task<IActionResult> RegisterAsync([FromBody] CreateUserRequest model, CancellationToken cancellationToken = default)
     {
-        await _authService.SignUpAsync(model, cancellationToken);
-        return Ok(new AuthencationApiResult()
+        var reponse = await _authService.SignUpAsync(model, cancellationToken);
+        return Ok(new
         {
             IsSucceeded = true,
+            Id = reponse.Context?.Id 
         });
     }
 

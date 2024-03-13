@@ -1,5 +1,5 @@
-﻿using Newtonsoft.Json;
-using IMGCloud.Utilities.RedisConfig;
+﻿using IMGCloud.Utilities.RedisConfig;
+using Newtonsoft.Json;
 
 namespace IMGCloud.Infrastructure.Services;
 

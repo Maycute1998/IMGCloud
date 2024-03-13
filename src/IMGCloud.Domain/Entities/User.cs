@@ -8,7 +8,7 @@ public class User : EntityBase<int>
 
     public string Email { get; set; } = string.Empty;
 
-    public UserDetail? UserInfos { get; set; }
+    public UserDetail? UserDetails { get; set; }
     public UserToken? UserTokens { get; set; }
 
     public virtual ICollection<Post>? Posts { get; set; } = new List<Post>();

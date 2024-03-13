@@ -43,6 +43,7 @@ public sealed class UserTokenRepository : RepositoryBase<UserToken, int>, IUserT
         }
         else
         {
+            context.UserId = user.Id;
             dbContext.UserTokens.Add(context.ToUserToken());
         }
 

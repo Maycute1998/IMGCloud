@@ -36,7 +36,7 @@ public sealed class UserConfiguration : IEntityTypeConfiguration<User>
             .IsRequired()
             .HasMaxLength(255);
 
-        builder.HasOne(x => x.UserInfos)
+        builder.HasOne(x => x.UserDetails)
             .WithOne(x => x.User)
             .HasForeignKey<UserDetail>(x => x.UserId)
             .IsRequired();
