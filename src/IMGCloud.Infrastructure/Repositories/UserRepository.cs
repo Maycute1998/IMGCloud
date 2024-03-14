@@ -11,10 +11,12 @@ public sealed class UserRepository : RepositoryBase<User, int>, IUserRepository
     {
     }
 
-    private Task CreateUserAsync(CreateUserRequest model, CancellationToken cancellationToken)
+    private async Task CreateUserAsync(CreateUserRequest model, CancellationToken cancellationToken)
     {
-        dbContext.Users.Add(model.ToUser());
-        return dbContext.SaveChangesAsync(cancellationToken);
+        var user = model.ToUser();
+        dbContext.Users.Add(user);
+        await dbContext.SaveChangesAsync(cancellationToken);
+        model.Id = user.Id;
     }
 
     private Task<User?> GetUserByUserNameAsync(string userName, CancellationToken cancellationToken)

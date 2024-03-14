@@ -51,9 +51,7 @@ namespace IMGCloud.Infrastructure.Services
             if (await _userRepository.IsExitsUserNameAsync(model.UserName!, cancellationToken)
                 || await _userRepository.IsExitsUserEmailAsync(model.Email, cancellationToken))
             {
-                string msg = string.Format(_stringLocalizer["emailAlreadyExits"].ToString(), model.UserName);
-                _logger.LogError($"Method [{nameof(CreateUserAsync)}] {Environment.NewLine} Error: {msg}");
-                return;
+                throw new ArgumentException("User is existed");
             }
 
             await _userRepository.CreateUserAsync(model, cancellationToken);

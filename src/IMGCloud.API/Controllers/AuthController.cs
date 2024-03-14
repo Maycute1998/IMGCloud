@@ -36,12 +36,22 @@ public class AuthController : ControllerBase
     [Route("register")]
     public async Task<IActionResult> RegisterAsync([FromBody] CreateUserRequest model, CancellationToken cancellationToken = default)
     {
-        await _authService.SignUpAsync(model, cancellationToken);
-        return Ok(new ApiResult<int>()
+        try
         {
-            IsSucceeded = true,
-            Context = model.Id
-        });
+            await _authService.SignUpAsync(model, cancellationToken);
+            return Ok(new ApiResult<int>()
+            {
+                IsSucceeded = true,
+                Context = model.Id
+            });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new ErrorApiResult<string>()
+            {
+                Message = ex.Message,
+            });
+        }
     }
 
     [HttpPost]
