@@ -51,8 +51,8 @@ public static partial class WebApplicationExtensions
 
     internal static void AddRepositoryApplication(this IServiceCollection services)
     {
-        services.AddTransient(typeof(IUnitOfWork), typeof(UnitOfWork));
-        services.AddTransient(typeof(IRepositoryBase<,>), typeof(RepositoryBase<,>));
+        services.AddScoped(typeof(IUnitOfWork), typeof(UnitOfWork));
+        services.AddScoped(typeof(IRepositoryBase<,>), typeof(RepositoryBase<,>));
 
         services.AddScoped<IPostRepository, PostRepository>();
         services.AddScoped<IUserRepository, UserRepository>();

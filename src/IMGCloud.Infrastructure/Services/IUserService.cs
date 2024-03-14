@@ -7,7 +7,7 @@ namespace IMGCloud.Infrastructure.Services;
 public interface IUserService
 {
     Task<int> GetUserIdByUserNameAsync(string userName, CancellationToken cancellationToken = default);
-    Task<UserDetail> GetUserDetailByUserNameAsync(string userName, CancellationToken cancellationToken = default);
+    Task<UserDetail?> GetUserDetailByUserNameAsync(string userName, CancellationToken cancellationToken = default);
     Task<bool> IsActiveUserAsync(SignInContext user, CancellationToken cancellationToken = default);
     Task CreateUserAsync(CreateUserRequest model, CancellationToken cancellationToken = default);
     Task<string?> GetExistedTokenAsync(int userId, CancellationToken cancellationToken = default);

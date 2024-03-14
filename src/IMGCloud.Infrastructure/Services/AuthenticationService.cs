@@ -67,14 +67,14 @@ public class AuthenticationService : IAuthenticationService
                     else
                     {
                         result.Token = tokenBuilder.GenerateAccessToken(true).Value;
-                        StoreToken(model.UserName, result.Token, expDate);
+                        await StoreTokenAsync(model.UserName, result.Token, expDate);
                     }
                 }
                 else
                 {
                     result.Token = tokenBuilder.GenerateAccessToken(true).Value;
                     // Store new token to database
-                    StoreToken(model.UserName, result.Token, expDate);
+                    await StoreTokenAsync(model.UserName, result.Token, expDate);
                 }
             }
             else
@@ -84,7 +84,7 @@ public class AuthenticationService : IAuthenticationService
                 var expiryDate = long.Parse(newClaimsData.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Exp).Value);
                 var expDate = UnixTimeStampToDateTime(expiryDate);
 
-                StoreToken(model.UserName, result.Token, expDate);
+                await StoreTokenAsync(model.UserName, result.Token, expDate);
 
             }
         }
@@ -122,7 +122,7 @@ public class AuthenticationService : IAuthenticationService
         return dtDateTime;
     }
 
-    private void StoreToken(string userName, string userToken, DateTime expireDate)
+    private async Task StoreTokenAsync(string userName, string userToken, DateTime expireDate)
     {
         var token = new UserTokenContext()
         {
@@ -131,7 +131,7 @@ public class AuthenticationService : IAuthenticationService
             ExpireDate = expireDate,
             IsActive = true
         };
-        _userService.StoreTokenAsync(token);
+        await _userService.StoreTokenAsync(token);
 
         var keyRedis = $"redis-{userName}";
         _redisCache.RemoveData(keyRedis);

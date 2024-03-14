@@ -15,7 +15,7 @@ public sealed class UserRepository : RepositoryBase<User, int>, IUserRepository
     {
         var user = model.ToUser();
         dbContext.Users.Add(user);
-        await dbContext.SaveChangesAsync(cancellationToken);
+        await this.SaveChangesAsync(cancellationToken);
         model.Id = user.Id;
     }
 
