@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IMGCloud.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(ImgCloudContext))]
-    [Migration("20240314022222_Init_DbContext")]
+    [Migration("20240314022944_Init_DbContext")]
     partial class Init_DbContext
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -52,7 +52,7 @@ namespace IMGCloud.Infrastructure.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Collections", (string)null);
+                    b.ToTable("Collection", (string)null);
                 });
 
             modelBuilder.Entity("IMGCloud.Domain.Entities.Comment", b =>
@@ -89,7 +89,7 @@ namespace IMGCloud.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Comments", (string)null);
+                    b.ToTable("Comment", (string)null);
                 });
 
             modelBuilder.Entity("IMGCloud.Domain.Entities.Post", b =>
@@ -138,7 +138,7 @@ namespace IMGCloud.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("UsersId");
 
-                    b.ToTable("Posts", (string)null);
+                    b.ToTable("Post", (string)null);
                 });
 
             modelBuilder.Entity("IMGCloud.Domain.Entities.PostImage", b =>
@@ -174,7 +174,7 @@ namespace IMGCloud.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("PostId");
 
-                    b.ToTable("PostImages", (string)null);
+                    b.ToTable("PostImage", (string)null);
                 });
 
             modelBuilder.Entity("IMGCloud.Domain.Entities.User", b =>
@@ -217,7 +217,7 @@ namespace IMGCloud.Infrastructure.Persistence.Migrations
                     b.HasIndex("UserName", "Email")
                         .IsUnique();
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("User", (string)null);
                 });
 
             modelBuilder.Entity("IMGCloud.Domain.Entities.UserDetail", b =>
@@ -309,7 +309,7 @@ namespace IMGCloud.Infrastructure.Persistence.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("UserTokens", (string)null);
+                    b.ToTable("UserToken", (string)null);
                 });
 
             modelBuilder.Entity("IMGCloud.Domain.Entities.Comment", b =>

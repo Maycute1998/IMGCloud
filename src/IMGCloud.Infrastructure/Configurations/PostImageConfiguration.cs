@@ -8,7 +8,7 @@ public sealed class PostImageConfiguration : IEntityTypeConfiguration<PostImage>
 {
     public void Configure(EntityTypeBuilder<PostImage> builder)
     {
-        builder.ToTable("PostImages");
+        builder.ToTable("PostImage");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id).UseIdentityColumn();
 

@@ -2,6 +2,14 @@
 
 namespace IMGCloud.Infrastructure.Requests;
 
-public record CreateUserRequest(int Id, [Required, MaxLength(255)] string UserName, [Required, MaxLength(255)] string Password, [Required, EmailAddress] string Email)
+public class CreateUserRequest
 {
+    public int Id { get; set; }
+    [Required]
+    public string UserName { get; set; } = string.Empty;
+    [Required]
+    public string Password { get; set; } = string.Empty ;
+    [Required]
+    [EmailAddress]
+    public string Email { get; set; } = string.Empty;
 }

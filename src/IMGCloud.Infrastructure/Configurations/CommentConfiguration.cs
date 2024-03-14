@@ -8,7 +8,7 @@ public sealed class CommentConfiguration : IEntityTypeConfiguration<Comment>
 {
     public void Configure(EntityTypeBuilder<Comment> builder)
     {
-        builder.ToTable("Comments");
+        builder.ToTable("Comment");
         builder.Property(x => x.Content).IsRequired().HasMaxLength(200);
 
         builder.HasOne(x => x.Post).WithMany(x => x.Comments).HasForeignKey(x => x.PostId);

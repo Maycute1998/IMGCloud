@@ -23,7 +23,8 @@ public static class UserSeed
                 UserName = "admin",
                 Password = password.ToHashPassword(),
                 CreatedDate = DateTime.UtcNow,
-                Email = "admin@img.com"
+                Email = "admin@img.com",
+                Status = Domain.Entities.Status.Active
             });
 
             dbContext.SaveChanges();
