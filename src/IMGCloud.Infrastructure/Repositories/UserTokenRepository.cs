@@ -30,30 +30,24 @@ public sealed class UserTokenRepository : RepositoryBase<UserToken, int>, IUserT
 
     private async Task StoreTokenAsync(UserTokenContext context, CancellationToken cancellationToken)
     {
-        try
+        var user = await dbContext.Users.Where(x => x.UserName.ToLower() == context.UserName.ToLower()).FirstOrDefaultAsync(cancellationToken);
+        if (user is null)
         {
-            var user = await dbContext.Users.Where(x => x.UserName.ToLower() == context.UserName.ToLower()).FirstOrDefaultAsync(cancellationToken);
-            if (user is null)
-            {
-                return;
-            }
-
-            var userToken = await dbContext.UserTokens.Where(x => x.UserId == user.Id).FirstOrDefaultAsync(cancellationToken);
-            if (userToken is not null)
-            {
-                dbContext.UserTokens.Update(context.ToUserToken(userToken));
-            }
-            else
-            {
-                context.UserId = user.Id;
-                dbContext.UserTokens.Add(context.ToUserToken());
-            }
-
-            await this.SaveChangesAsync(cancellationToken);
+            return;
         }
-        catch (Exception ex) 
+
+        var userToken = await dbContext.UserTokens.Where(x => x.UserId == user.Id).FirstOrDefaultAsync(cancellationToken);
+        if (userToken is not null)
         {
+            this.dbContext.UserTokens.Update(context.ToUserToken(userToken));
         }
+        else
+        {
+            context.UserId = user.Id;
+            this.dbContext.UserTokens.Add(context.ToUserToken());
+        }
+
+        await this.SaveChangesAsync(cancellationToken);
     }
 
     Task<string?> IUserTokenRepository.GetExistedTokenAsync(int userId, CancellationToken cancellationToken)

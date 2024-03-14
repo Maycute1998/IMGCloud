@@ -1,5 +1,4 @@
 ﻿using IMGCloud.Domain.Cores;
-using IMGCloud.Domain.Entities;
 using IMGCloud.Infrastructure.Context;
 using IMGCloud.Infrastructure.Requests;
 

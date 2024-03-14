@@ -65,47 +65,16 @@ namespace IMGCloud.Infrastructure.Services
 
         public async Task<bool> IsActiveUserAsync(SignInContext model, CancellationToken cancellationToken)
         {
-
-            var activeUser = await _userRepository.GetUserByUserNameAsync(model.UserName!);
-            if (activeUser is not null)
+            var entity = await _userRepository.GetUserByUserNameAsync(model.UserName!);
+            if (entity is null)
             {
-                var isValidPassword = model.Password.VerifyPassword(activeUser.Password);
-                if (isValidPassword)
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
+                return false;
             }
-
-            return false;
-        }
-
-        public async Task<bool> IsExistEmailAsync(string email)
-        {
-            try
-            {
-                var user = await _userRepository.IsExitsUserEmailAsync(email);
-                if (user)
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Method [{nameof(IsExistEmailAsync)}] {Environment.NewLine} Error: {ex.Message}");
-            }
-            return false;
+            return model.Password.VerifyPassword(entity.Password);
         }
 
         private Task<bool> IsExistEmailAsync(string email, CancellationToken cancellationToken)
-        => this.IsExistEmailAsync(email, cancellationToken);
+        => _userRepository.IsExitsUserEmailAsync(email, cancellationToken);
 
         private Task<int> GetUserIdByUserNameAsync(string userName, CancellationToken cancellationToken)
         => _userRepository.GetUserIdByUserNameAsync(userName, cancellationToken);
@@ -116,7 +85,6 @@ namespace IMGCloud.Infrastructure.Services
 
         private Task StoreTokenAsync(UserTokenContext context, CancellationToken cancellationToken)
         => _userTokenRepository.StoreTokenAsync(context, cancellationToken);
-
 
         private async Task RemoveTokenAsync(CancellationToken cancellationToken)
         {
@@ -129,18 +97,17 @@ namespace IMGCloud.Infrastructure.Services
             await _userTokenRepository.RemoveTokenAsync(curentUser.Id, cancellationToken);
         }
 
-        public Task<UserDetail?> GetUserByIdAsync(int id, CancellationToken cancellationToken)
+        Task<bool> IUserService.IsExistEmailAsync(string email, CancellationToken cancellationToken)
+        => this.IsExistEmailAsync(email, cancellationToken);
+        Task<UserDetail?> IUserService.GetUserByIdAsync(int id, CancellationToken cancellationToken)
         => _userDetailRepository.GetByUserIdAsync(id, cancellationToken);
-
-
         Task<int> IUserService.GetUserIdByUserNameAsync(string userName, CancellationToken cancellationToken)
         => this.GetUserIdByUserNameAsync(userName, cancellationToken);
 
         Task<bool> IUserService.IsActiveUserAsync(SignInContext user, CancellationToken cancellationToken)
         => this.IsActiveUserAsync(user, cancellationToken);
 
-
-
+        #region Implementation of IUserService
         Task<string?> IUserService.GetExistedTokenAsync(int userId, CancellationToken cancellationToken)
         => this.GetExistedTokenAsync(userId, cancellationToken);
 
@@ -152,14 +119,13 @@ namespace IMGCloud.Infrastructure.Services
 
         Task<UserDetail?> IUserService.GetUserDetailByUserNameAsync(string userName, CancellationToken cancellationToken)
         => this.GetUserDetailByUserNameAsync(userName, cancellationToken);
-
-
-
         Task IUserService.CreateUserDetailAsync(UserDetailsRequest userDetail, CancellationToken cancellationToken)
         => this.CreateUserDetailAsync(userDetail, cancellationToken);
 
         Task IUserService.CreateUserAsync(CreateUserRequest model, CancellationToken cancellationToken)
         => this.CreateUserAsync(model, cancellationToken);
+        #endregion
+
     }
 }
 
