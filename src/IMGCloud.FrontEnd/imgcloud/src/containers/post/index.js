@@ -30,7 +30,7 @@ const Post = () => {
   }, []);
 
   function handleClickImage() {
-    
+
   } 
 
   return (
@@ -43,17 +43,17 @@ const Post = () => {
                 <img
                   className="image"
                   alt=""
-                  src={post.postImages[0].imagePath}
+                  src={post.imagePath}
                   onClick={handleClickImage()}
                 />
                 <div className="user-img">
                   <img
                     className="avatar"
-                    alt=""
-                    src={post.users.userDetails.photo}
+                    alt={post.caption}
+                    src={post.userAvatar}  
                   />
                   <div className="user-details">
-                    <span className="user-name">{post.users.userName}</span>
+                    <span className="user-name">{post.userName}</span>
                     <span className="caption">{post.caption}</span>
                   </div>
                 </div>

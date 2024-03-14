@@ -1,5 +1,6 @@
 ﻿using IMGCloud.Domain.Cores;
 using IMGCloud.Domain.Entities;
+using IMGCloud.Infrastructure.Context;
 using IMGCloud.Infrastructure.Requests;
 using IMGCloud.Infrastructure.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -21,7 +22,7 @@ public sealed class UsersController : ControllerBase
     public async Task<IActionResult> GetUserByNameAsync(string name, CancellationToken cancellationToken = default)
     {
         var data = await _userService.GetUserDetailByUserNameAsync(name, cancellationToken);
-        return Ok(new ApiResult<UserDetail>()
+        return Ok(new ApiResult<UserDetailContext>()
         {
             Context = data,
             IsSucceeded = true,

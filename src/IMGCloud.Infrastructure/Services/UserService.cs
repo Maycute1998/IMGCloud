@@ -57,7 +57,7 @@ namespace IMGCloud.Infrastructure.Services
             await _userRepository.CreateUserAsync(model, cancellationToken);
         }
 
-        private Task<UserDetail?> GetUserDetailByUserNameAsync(string userName, CancellationToken cancellationToken)
+        private Task<UserDetailContext?> GetUserDetailByUserNameAsync(string userName, CancellationToken cancellationToken)
         => _userDetailRepository.GetByUserNameAsync(userName, cancellationToken);
 
         private Task CreateUserDetailAsync(UserDetailsRequest userInfo, CancellationToken cancellationToken = default)
@@ -118,7 +118,7 @@ namespace IMGCloud.Infrastructure.Services
         => this.CreateUserDetailAsync(userDetail, cancellationToken);
         Task IUserService.CreateUserAsync(CreateUserRequest model, CancellationToken cancellationToken)
         => this.CreateUserAsync(model, cancellationToken);
-        Task<UserDetail?> IUserService.GetUserDetailByUserNameAsync(string userName, CancellationToken cancellationToken)
+        Task<UserDetailContext?> IUserService.GetUserDetailByUserNameAsync(string userName, CancellationToken cancellationToken)
         => this.GetUserDetailByUserNameAsync(userName, cancellationToken);
         #endregion
 

@@ -1,7 +1,9 @@
 ﻿using IMGCloud.Domain.Entities;
+using IMGCloud.Infrastructure.Context;
 using IMGCloud.Infrastructure.Extensions;
 using IMGCloud.Infrastructure.Requests;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Text.Json;
 
 namespace IMGCloud.Infrastructure.Repositories;
@@ -23,34 +25,20 @@ public sealed class PostRepository : RepositoryBase<Post, int>, IPostRepository
         throw new NotImplementedException();
     }
 
-    private async Task<List<Post>> GetAllPostsAsync(CancellationToken cancellationToken = default)
+    private async Task<List<PostContext>> GetAllPostsAsync(CancellationToken cancellationToken = default)
     {
         return await dbContext.Posts
             .Include(x => x.PostImages)
             .Include(x => x.Users)
                 .ThenInclude(u => u.UserDetails)
             .Where(x => x.Status == Status.Active)
-            .Select(post => new Post
+            .Select(post => new PostContext
             {
-                Id = post.Id,
-                Caption = post.Caption,
-                CollectionId = post.CollectionId,
-                Emotion = post.Emotion,
-                Location = post.Location,
-                PostPrivacy = post.PostPrivacy,
-                Users = new User
-                {
-                    UserName = post.Users!.UserName,
-                    UserDetails = new UserDetail
-                    {
-                        Photo = post.Users.UserDetails!.Photo 
-                    }
-                },
-                PostImages = post.PostImages!.Select(image => new PostImage
-                {
-                    ImagePath = image.ImagePath
-                }).ToList(),
-            }).ToListAsync(cancellationToken);
+                UserName = post.Users!.UserName,
+                UserAvatar = post.Users.UserDetails!.Photo,
+                ImagePath = post.PostImages!.First().ImagePath
+            }.MapFor(post))
+            .ToListAsync(cancellationToken);
     }
 
     private Task CreatePostAsync(CreatePostRequest post, CancellationToken cancellationToken)
@@ -74,6 +62,6 @@ public sealed class PostRepository : RepositoryBase<Post, int>, IPostRepository
     Task IPostRepository.PressHeartAsync(CreatePostRequest post, CancellationToken cancellationToken)
     => this.PressHeartAsync(post, cancellationToken);
 
-    Task<List<Post>> IPostRepository.GetAllPostsAsync(CancellationToken cancellationToken = default)
+    Task<List<PostContext>> IPostRepository.GetAllPostsAsync(CancellationToken cancellationToken = default)
     => this.GetAllPostsAsync(cancellationToken);
 }
