@@ -1,4 +1,4 @@
-using IMGCloud.API.Persistence;
+using IMGCloud.Infrastructure.Persistence;
 using IMGCloud.API.Extensions;
 
 try

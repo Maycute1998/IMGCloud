@@ -1,8 +1,9 @@
-﻿using IMGCloud.Infrastructure;
-using IMGCloud.Utilities.PasswordHashExtension;
+﻿using IMGCloud.Utilities.PasswordHashExtension;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
-namespace IMGCloud.API.Persistence;
+namespace IMGCloud.Infrastructure.Persistence;
 
 public static class UserSeed
 {
@@ -23,7 +24,8 @@ public static class UserSeed
                 UserName = "admin",
                 Password = password.ToHashPassword(),
                 CreatedDate = DateTime.UtcNow,
-                Email = "admin@img.com"
+                Email = "admin@img.com",
+                Status = Domain.Entities.Status.Active,
             });
 
             dbContext.SaveChanges();

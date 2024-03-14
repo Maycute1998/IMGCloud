@@ -9,7 +9,7 @@ public sealed class CollectionConfiguration : IEntityTypeConfiguration<Collectio
 
     public void Configure(EntityTypeBuilder<Collection> builder)
     {
-        builder.ToTable("Collections");
+        builder.ToTable("Collection");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id).UseIdentityColumn();
         builder.Property(x => x.CollectionName).HasColumnType("nvarchar(100)");

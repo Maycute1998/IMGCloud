@@ -14,7 +14,7 @@ public sealed class PostConfiguration : IEntityTypeConfiguration<Post>
 
     public void Configure(EntityTypeBuilder<Post> builder)
     {
-        builder.ToTable("Posts");
+        builder.ToTable("Post");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id).UseIdentityColumn();
         builder.Property(x => x.Heart).HasDefaultValue(0);
