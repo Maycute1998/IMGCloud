@@ -15,10 +15,10 @@ const register = async (email, username, password) => {
   });
 };
 
-const getUserById = (id) => axios.get("/users?id=" + id);
+const getUserDetailsByName = (userName) => axios.get("/users?name=" + userName);
 const createUserInfo = async (userInfo) => {
   return axios.post("users/create", userInfo);
 };
 
-export { createUserInfo, getUserById, login, register };
+export { createUserInfo, getUserDetailsByName, login, register };
 
