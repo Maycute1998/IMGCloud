@@ -1,10 +1,5 @@
 ﻿using IMGCloud.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace IMGCloud.Infrastructure.Repositories;
 
@@ -19,18 +14,18 @@ public sealed class UserDetailRepository : RepositoryBase<UserDetail, int>, IUse
         return FindBy(x => x.UserId == id && x.Status == Status.Active).FirstOrDefaultAsync(cancellationToken);
     }
 
-    private Task<UserDetail?> GetUserByIdAsync(int id, CancellationToken cancellationToken)
+    private Task<UserDetail?> GetByUserNameAsync(string userName, CancellationToken cancellationToken)
     {
         return dbContext.UserDetails
             .Include(x => x.User)
             .AsNoTracking()
-            .Where(x => x.User.Id == id)
+            .Where(x => x.User!.UserName == userName)
             .FirstOrDefaultAsync(cancellationToken);
     }
 
-    Task<UserDetail?> IUserDetailRepository.GetUserDetailbyUserIdAsync(int id, CancellationToken cancellationToken)
+    Task<UserDetail?> IUserDetailRepository.GetByUserIdAsync(int id, CancellationToken cancellationToken)
     => this.GetUserDetailbyUserIdAsync(id, cancellationToken);
 
-    Task<UserDetail?> IUserDetailRepository.GetUserByIdAsync(int id, CancellationToken cancellationToken)
-    => this.GetUserByIdAsync(id, cancellationToken);
+    Task<UserDetail?> IUserDetailRepository.GetByUserNameAsync(string userName, CancellationToken cancellationToken)
+    => this.GetByUserNameAsync(userName, cancellationToken);
 }

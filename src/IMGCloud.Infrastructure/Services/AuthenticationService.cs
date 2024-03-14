@@ -94,7 +94,7 @@ public class AuthenticationService : IAuthenticationService
     private Task SignOutAsync(CancellationToken cancellationToken)
     => _userService.RemoveTokenAsync(cancellationToken);
 
-    private Task<ApiResult<User>> SignUpAsync(CreateUserRequest model, CancellationToken cancellationToken)
+    private Task SignUpAsync(CreateUserRequest model, CancellationToken cancellationToken)
     => _userService.CreateUserAsync(model, cancellationToken);
 
     private bool IsExistedTokenExpired(string existedUserToken, DateTime expDate)
@@ -144,7 +144,7 @@ public class AuthenticationService : IAuthenticationService
         _redisCache.SetData(keyRedis, redisData, expireDate);
     }
 
-    Task<ApiResult<User>> IAuthenticationService.SignUpAsync(CreateUserRequest model, CancellationToken cancellationToken)
+    Task IAuthenticationService.SignUpAsync(CreateUserRequest model, CancellationToken cancellationToken)
     => this.SignUpAsync(model, cancellationToken);
 
     Task<AuthencationResult> IAuthenticationService.SignInAsync(SignInContext model, CancellationToken cancellationToken)

@@ -1,6 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
+﻿using IMGCloud.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using IMGCloud.Domain.Entities;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace IMGCloud.Infrastructure.Configurations;
 

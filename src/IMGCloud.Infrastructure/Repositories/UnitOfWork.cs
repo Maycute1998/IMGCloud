@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-
-namespace IMGCloud.Infrastructure.Repositories;
+﻿namespace IMGCloud.Infrastructure.Repositories;
 
 public sealed class UnitOfWork : IUnitOfWork
 {

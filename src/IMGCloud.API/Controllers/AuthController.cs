@@ -1,5 +1,4 @@
 ﻿using IMGCloud.Domain.Cores;
-using IMGCloud.Domain.Entities;
 using IMGCloud.Infrastructure.Context;
 using IMGCloud.Infrastructure.Requests;
 using IMGCloud.Infrastructure.Services;
@@ -37,11 +36,11 @@ public class AuthController : ControllerBase
     [Route("register")]
     public async Task<IActionResult> RegisterAsync([FromBody] CreateUserRequest model, CancellationToken cancellationToken = default)
     {
-        var reponse = await _authService.SignUpAsync(model, cancellationToken);
-        return Ok(new
+        await _authService.SignUpAsync(model, cancellationToken);
+        return Ok(new ApiResult<int>()
         {
             IsSucceeded = true,
-            Id = reponse.Context?.Id 
+            Context = model.Id
         });
     }
 

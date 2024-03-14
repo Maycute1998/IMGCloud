@@ -30,9 +30,9 @@ public sealed class UsersController : ControllerBase
 
     [HttpPost]
     [Route("create")]
-    public async Task<IActionResult> CreateUserInfoAsync([FromBody]UserDetailsRequest userInfo, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> CreateUserInfoAsync([FromBody] UserDetailsRequest userInfo, CancellationToken cancellationToken = default)
     {
-        var respone = await _userService.CreateUserInfoAsync(userInfo, cancellationToken);
-        return respone.IsSucceeded ? Ok(new ApiResult<UserDetail>() {Message = respone.Message, IsSucceeded = respone.IsSucceeded }) : BadRequest();
+        await _userService.CreateUserDetailAsync(userInfo, cancellationToken);
+        return Ok();
     }
 }

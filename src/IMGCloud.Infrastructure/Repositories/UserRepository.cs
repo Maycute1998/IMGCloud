@@ -45,15 +45,7 @@ public sealed class UserRepository : RepositoryBase<User, int>, IUserRepository
         var entity = await this.GetUserByUserNameAsync(userName, cancellationToken);
         return entity is not null;
     }
-    public Task CreateUserInfoAsync(UserInfoRequest userInfo, CancellationToken cancellationToken = default)
-    {
-        var user = new UserInfo().MapFor(userInfo);
-        user.CreatedDate = DateTime.Now;
-        user.ModifiedDate = DateTime.Now;
-        user.Status = Status.Active;
-        dbContext.UserInfos.Add(user);
-        return dbContext.SaveChangesAsync(cancellationToken);
-    }
+
     Task IUserRepository.CreateUserAsync(CreateUserRequest model, CancellationToken cancellationToken)
     => this.CreateUserAsync(model, cancellationToken);
     Task<User?> IUserRepository.GetUserByUserNameAsync(string userName, CancellationToken cancellationToken)
@@ -67,4 +59,8 @@ public sealed class UserRepository : RepositoryBase<User, int>, IUserRepository
     Task<bool> IUserRepository.IsExitsUserNameAsync(string userName, CancellationToken cancellationToken)
     => this.IsExitsUserNameAsync(userName, cancellationToken);
 
+    public Task CreateUserDetailAsync(UserDetailsRequest userInfo, CancellationToken cancellationToken = default)
+    {
+        throw new NotImplementedException();
+    }
 }
