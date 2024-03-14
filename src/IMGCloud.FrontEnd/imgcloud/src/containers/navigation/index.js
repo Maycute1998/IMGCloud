@@ -21,7 +21,6 @@ const Navigation = () => {
   const [userData, setUserData] = useState("");
 
   const open = Boolean(anchorEl);
-  //const userId = localStorage.getItem(USER_ID);
   const userName = localStorage.getItem(USER_NAME);
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -30,33 +29,41 @@ const Navigation = () => {
     setAnchorEl(null);
   };
 
-  const handleLogout= () => {
+  const handleLogout = () => {
     localStorage.clear();
     window.location.reload();
   };
 
   async function fetchData() {
-    // You can await here
-    const response = await getUserDetailsByName(userName);
-    if (response.status === Ok) {
-      return response.data;
+    try {
+      const response = await getUserDetailsByName(userName);
+      if (response.status === Ok) {
+        return response.data;
+      } else {
+        throw new Error("Failed to fetch user data");
+      }
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      throw error;
     }
   }
 
   useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const userData = await fetchData();
+        if (userData && userData.context) {
+          setUserData(userData.context);
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };
+  
     if (userName) {
-      fetchData(  )
-        .then((res) => {
-          if (res && res.context) {
-            setUserData(res.context);
-          }
-        })
-        .catch((error) => {
-          // Handle errors
-          console.error("Error fetching user data:", error);
-        });
+      fetchUserData();
     }
-  }, []);
+  }, [userName]);
 
   return (
     <div>
