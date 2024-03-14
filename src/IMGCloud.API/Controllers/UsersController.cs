@@ -18,9 +18,9 @@ public sealed class UsersController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetUserByIdAsync(int id, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> GetUserByNameAsync(string name, CancellationToken cancellationToken = default)
     {
-        var data = await _userService.GetUserByIdAsync(id, cancellationToken);
+        var data = await _userService.GetUserDetailByUserNameAsync(name, cancellationToken);
         return Ok(new ApiResult<UserDetail>()
         {
             Context = data,

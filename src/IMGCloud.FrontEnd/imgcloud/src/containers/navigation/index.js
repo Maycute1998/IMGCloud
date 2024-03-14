@@ -12,8 +12,8 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import React, { useEffect, useState } from "react";
-import { Ok, USER_ID } from "../../const/constant";
-import { getUserById } from "../../services/user-service";
+import { Ok, USER_NAME } from "../../const/constant";
+import { getUserDetailsByName } from "../../services/user-service";
 import "./nav.scss";
 
 const Navigation = () => {
@@ -21,7 +21,8 @@ const Navigation = () => {
   const [userData, setUserData] = useState("");
 
   const open = Boolean(anchorEl);
-  const userId = localStorage.getItem(USER_ID);
+  //const userId = localStorage.getItem(USER_ID);
+  const userName = localStorage.getItem(USER_NAME);
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -29,16 +30,21 @@ const Navigation = () => {
     setAnchorEl(null);
   };
 
+  const handleLogout= () => {
+    localStorage.clear();
+    window.location.reload();
+  };
+
   async function fetchData() {
     // You can await here
-    const response = await getUserById(userId);
+    const response = await getUserDetailsByName(userName);
     if (response.status === Ok) {
       return response.data;
     }
   }
 
   useEffect(() => {
-    if (userId) {
+    if (userName) {
       fetchData(  )
         .then((res) => {
           if (res && res.context) {
@@ -159,7 +165,7 @@ const Navigation = () => {
                       </ListItemIcon>
                       Settings
                     </MenuItem>
-                    <MenuItem onClick={handleClose}>
+                    <MenuItem onClick={handleLogout}>
                       <ListItemIcon>
                         <Logout fontSize="small" />
                       </ListItemIcon>

@@ -1,7 +1,10 @@
-﻿using IMGCloud.Infrastructure.Services;
+﻿using IMGCloud.Domain.Cores;
+using IMGCloud.Domain.Entities;
+using IMGCloud.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading;
 
 namespace IMGCloud.API.Controllers;
 
@@ -17,10 +20,13 @@ public sealed class PostsController : ControllerBase
         _postService = postService;
     }
 
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [HttpGet]
-    public string Get()
+    [Route("all-post")]
+    public async Task<IActionResult> GetAllPostAsync(CancellationToken cancellationToken = default)
     {
-        return "Test";
+        var respone = await _postService.GetAllPostsAsync(cancellationToken);
+        return Ok(respone);
+
     }
 }

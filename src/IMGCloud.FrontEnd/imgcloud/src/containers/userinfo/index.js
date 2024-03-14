@@ -6,7 +6,7 @@ import Stepper from "@mui/material/Stepper";
 import Typography from "@mui/material/Typography";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Ok, USER_ID } from "../../const/constant";
+import { Ok, USER_NAME } from "../../const/constant";
 import { createUserInfo } from "../../services/user-service";
 import AvatarUpload from "../common/avatar-upload";
 import "./user-info.scss";
@@ -24,7 +24,7 @@ const UserInfo = () => {
   const [open, setOpen] = React.useState(false);
   const [selectedValue, setSelectedValue] = React.useState("");
   const [userInfo, setUserInfo] = useState({
-    userId: localStorage.getItem(USER_ID),
+    userName: localStorage.getItem(USER_NAME),
     fullName: "",
     address: "",
     birthday: "",

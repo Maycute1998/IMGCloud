@@ -39,10 +39,10 @@ public class AuthController : ControllerBase
         try
         {
             await _authService.SignUpAsync(model, cancellationToken);
-            return Ok(new ApiResult<int>()
+            return Ok(new ApiResult<string>()
             {
                 IsSucceeded = true,
-                Context = model.Id
+                Context = model.UserName,
             });
         }
         catch (Exception ex)

@@ -58,10 +58,10 @@ namespace IMGCloud.Infrastructure.Services
         }
 
         private Task<UserDetail?> GetUserDetailByUserNameAsync(string userName, CancellationToken cancellationToken)
-        => this._userDetailRepository.GetByUserNameAsync(userName, cancellationToken);
+        => _userDetailRepository.GetByUserNameAsync(userName, cancellationToken);
 
-        public Task CreateUserDetailAsync(UserDetailsRequest userInfo, CancellationToken cancellationToken = default)
-        => _userRepository.CreateUserDetailAsync(userInfo, cancellationToken);
+        public async Task CreateUserDetailAsync(UserDetailsRequest userInfo, CancellationToken cancellationToken = default)
+        => await _userRepository.CreateUserDetailAsync(userInfo, cancellationToken);
 
         public async Task<bool> IsActiveUserAsync(SignInContext model, CancellationToken cancellationToken)
         {
@@ -76,8 +76,8 @@ namespace IMGCloud.Infrastructure.Services
         private Task<bool> IsExistEmailAsync(string email, CancellationToken cancellationToken)
         => _userRepository.IsExitsUserEmailAsync(email, cancellationToken);
 
-        private Task<int> GetUserIdByUserNameAsync(string userName, CancellationToken cancellationToken)
-        => _userRepository.GetUserIdByUserNameAsync(userName, cancellationToken);
+        private Task<User> GetUserIdByUserNameAsync(string userName, CancellationToken cancellationToken)
+        => _userRepository.GetUserByUserNameAsync(userName, cancellationToken);
 
 
         private Task<string?> GetExistedTokenAsync(int userId, CancellationToken cancellationToken)
@@ -101,7 +101,7 @@ namespace IMGCloud.Infrastructure.Services
         => this.IsExistEmailAsync(email, cancellationToken);
         Task<UserDetail?> IUserService.GetUserByIdAsync(int id, CancellationToken cancellationToken)
         => _userDetailRepository.GetByUserIdAsync(id, cancellationToken);
-        Task<int> IUserService.GetUserIdByUserNameAsync(string userName, CancellationToken cancellationToken)
+        Task<User> IUserService.GetUserByUserNameAsync(string userName, CancellationToken cancellationToken)
         => this.GetUserIdByUserNameAsync(userName, cancellationToken);
 
         Task<bool> IUserService.IsActiveUserAsync(SignInContext user, CancellationToken cancellationToken)
@@ -117,8 +117,8 @@ namespace IMGCloud.Infrastructure.Services
         Task IUserService.RemoveTokenAsync(CancellationToken cancellationToken)
         => this.RemoveTokenAsync(cancellationToken);
 
-        Task<UserDetail?> IUserService.GetUserDetailByUserNameAsync(string userName, CancellationToken cancellationToken)
-        => this.GetUserDetailByUserNameAsync(userName, cancellationToken);
+        Task<UserDetail?> IUserService.GetUserByIdAsync(int id, CancellationToken cancellationToken)
+        => this.GetUserByIdAsync(id, cancellationToken);
         Task IUserService.CreateUserDetailAsync(UserDetailsRequest userDetail, CancellationToken cancellationToken)
         => this.CreateUserDetailAsync(userDetail, cancellationToken);
 

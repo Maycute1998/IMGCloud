@@ -8,9 +8,6 @@
   .box img {
     max-width: 100%;
     border-radius: 20px;
-    .user-name {
-      margin-left: 2%;
-    }
     .image {
       border-radius: 36px;
     }
@@ -21,7 +18,18 @@
     align-items: center;
     .avatar {
       border-radius: 50%;
-      width: 30px;
+      width: 25px;
+    }
+    .user-name {
+      margin-left: 2%;
+      font-size: 12px !important;
+      font-weight: 600;
+      line-height: 0.2
+    }
+    .caption{
+      margin-left: 2%;
+      font-size: 12px !important;
+      line-height: 0.2
     }
   }
 }
@@ -37,6 +45,12 @@
   .container {
     width: calc(100% - 40px);
     columns: 4;
+    .user-img {
+      .avatar {
+        border-radius: 50%;
+        width: 15px;
+      }
+    }
   }
 }
 

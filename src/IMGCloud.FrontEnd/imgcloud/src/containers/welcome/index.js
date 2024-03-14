@@ -2,7 +2,7 @@ import Alert from "@mui/material/Alert";
 import * as React from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Ok, TOKEN_KEY, USER_ID, USER_NAME } from "../../const/constant";
+import { Ok, TOKEN_KEY, USER_NAME } from "../../const/constant";
 import { login, register } from "../../services/user-service";
 import "./welcome.scss";
 
@@ -28,7 +28,7 @@ const Welcome = () => {
       } else {
         let res = await register(email, username, password);
         if (res.status === Ok) {
-          localStorage.setItem(USER_ID, res.data.id);
+          localStorage.setItem(USER_NAME, res.data.context);
           await login(username, password).then((res) => {
             if (res.status === Ok) {
               localStorage.setItem(TOKEN_KEY, res.data.token);
