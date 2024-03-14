@@ -47,8 +47,8 @@ public class AuthenticationService : IAuthenticationService
         var isExistUser = await _userService.IsActiveUserAsync(model, cancellationToken);
         if (isExistUser)
         {
-            var userId = await _userService.GetUserIdByUserNameAsync(model.UserName, cancellationToken);
-            var existedUserToken = await _userService.GetExistedTokenAsync(userId, cancellationToken);
+            var user = await _userService.GetUserByUserNameAsync(model.UserName, cancellationToken);
+            var existedUserToken = await _userService.GetExistedTokenAsync(user.Id, cancellationToken);
             if (!string.IsNullOrWhiteSpace(existedUserToken))
             {
 

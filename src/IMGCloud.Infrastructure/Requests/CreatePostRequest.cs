@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace IMGCloud.Infrastructure.Requests;
 
-public record CreatePostRequest(string? Caption, string? Location, string? Emotion, int? CollectionId, PostPrivacy PostPrivacy, IFormFile? PostImage)
+public record CreatePostRequest(string? Caption, string? Location, string? Emotion, int? CollectionId, PostPrivacy PostPrivacy, string ImagePath)
 {
 
 }
