@@ -1,8 +1,6 @@
-﻿using Amazon.Runtime.Internal;
-using IMGCloud.Domain.Entities;
+﻿using IMGCloud.Domain.Entities;
 using IMGCloud.Infrastructure.Extensions;
 using IMGCloud.Infrastructure.Requests;
-using IMGCloud.Utilities.PasswordHashExtension;
 using Microsoft.EntityFrameworkCore;
 
 namespace IMGCloud.Infrastructure.Repositories;
@@ -23,7 +21,7 @@ public sealed class UserRepository : RepositoryBase<User, int>, IUserRepository
 
     private Task<User?> GetUserByUserNameAsync(string userName, CancellationToken cancellationToken)
     {
-        return FindBy(x => x.UserName.ToLower() == userName.ToLower() 
+        return FindBy(x => x.UserName.ToLower() == userName.ToLower()
                         && x.Status == Status.Active).FirstOrDefaultAsync(cancellationToken);
     }
 
@@ -47,16 +45,17 @@ public sealed class UserRepository : RepositoryBase<User, int>, IUserRepository
 
     public async Task CreateUserDetailAsync(UserDetailsRequest userInfo, CancellationToken cancellationToken = default)
     {
-        var userDetail = new UserDetail().MapFor(userInfo);
+        var entity = userInfo.ToUserDetail();
         var user = await GetUserByUserNameAsync(userInfo.UserName, cancellationToken);
         if (user is not null)
         {
-            userDetail.UserId = user!.Id;
-            userDetail.CreatedDate = DateTime.Now;
-            userDetail.ModifiedDate = DateTime.Now;
-            userDetail.Status = Status.Active;
-            dbContext.UserDetails.Add(userDetail);
-            await dbContext.SaveChangesAsync(cancellationToken);
+            entity.UserId = user!.Id;
+            entity.CreatedDate = DateTime.Now;
+            entity.ModifiedDate = DateTime.Now;
+            entity.Status = Status.Active;
+            dbContext.UserDetails.Add(entity);
+            await this.SaveChangesAsync(cancellationToken);
+            userInfo.Id = entity.Id;
         }
     }
 

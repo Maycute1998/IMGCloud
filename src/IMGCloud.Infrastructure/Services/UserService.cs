@@ -60,8 +60,8 @@ namespace IMGCloud.Infrastructure.Services
         private Task<UserDetail?> GetUserDetailByUserNameAsync(string userName, CancellationToken cancellationToken)
         => _userDetailRepository.GetByUserNameAsync(userName, cancellationToken);
 
-        public async Task CreateUserDetailAsync(UserDetailsRequest userInfo, CancellationToken cancellationToken = default)
-        => await _userRepository.CreateUserDetailAsync(userInfo, cancellationToken);
+        private Task CreateUserDetailAsync(UserDetailsRequest userInfo, CancellationToken cancellationToken = default)
+        => _userRepository.CreateUserDetailAsync(userInfo, cancellationToken);
 
         public async Task<bool> IsActiveUserAsync(SignInContext model, CancellationToken cancellationToken)
         {
@@ -78,7 +78,6 @@ namespace IMGCloud.Infrastructure.Services
 
         private Task<User> GetUserIdByUserNameAsync(string userName, CancellationToken cancellationToken)
         => _userRepository.GetUserByUserNameAsync(userName, cancellationToken);
-
 
         private Task<string?> GetExistedTokenAsync(int userId, CancellationToken cancellationToken)
         => _userTokenRepository.GetExistedTokenAsync(userId, cancellationToken);
@@ -97,33 +96,30 @@ namespace IMGCloud.Infrastructure.Services
             await _userTokenRepository.RemoveTokenAsync(curentUser.Id, cancellationToken);
         }
 
+        private Task<UserDetail?> GetUserByIdAsync(int id, CancellationToken cancellationToken)
+        => _userDetailRepository.GetByUserIdAsync(id, cancellationToken);
+
+        #region Implementation of IUserService
         Task<bool> IUserService.IsExistEmailAsync(string email, CancellationToken cancellationToken)
         => this.IsExistEmailAsync(email, cancellationToken);
         Task<UserDetail?> IUserService.GetUserByIdAsync(int id, CancellationToken cancellationToken)
-        => _userDetailRepository.GetByUserIdAsync(id, cancellationToken);
+        => this.GetUserByIdAsync(id, cancellationToken);
         Task<User> IUserService.GetUserByUserNameAsync(string userName, CancellationToken cancellationToken)
         => this.GetUserIdByUserNameAsync(userName, cancellationToken);
-
         Task<bool> IUserService.IsActiveUserAsync(SignInContext user, CancellationToken cancellationToken)
         => this.IsActiveUserAsync(user, cancellationToken);
-
-        #region Implementation of IUserService
         Task<string?> IUserService.GetExistedTokenAsync(int userId, CancellationToken cancellationToken)
         => this.GetExistedTokenAsync(userId, cancellationToken);
-
         Task IUserService.StoreTokenAsync(UserTokenContext context, CancellationToken cancellationToken)
         => this.StoreTokenAsync(context, cancellationToken);
-
         Task IUserService.RemoveTokenAsync(CancellationToken cancellationToken)
         => this.RemoveTokenAsync(cancellationToken);
-
-        Task<UserDetail?> IUserService.GetUserByIdAsync(int id, CancellationToken cancellationToken)
-        => this.GetUserByIdAsync(id, cancellationToken);
         Task IUserService.CreateUserDetailAsync(UserDetailsRequest userDetail, CancellationToken cancellationToken)
         => this.CreateUserDetailAsync(userDetail, cancellationToken);
-
         Task IUserService.CreateUserAsync(CreateUserRequest model, CancellationToken cancellationToken)
         => this.CreateUserAsync(model, cancellationToken);
+        Task<UserDetail?> IUserService.GetUserDetailByUserNameAsync(string userName, CancellationToken cancellationToken)
+        => this.GetUserDetailByUserNameAsync(userName, cancellationToken);
         #endregion
 
     }

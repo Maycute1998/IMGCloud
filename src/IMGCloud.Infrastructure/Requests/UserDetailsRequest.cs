@@ -1,13 +1,14 @@
 ﻿namespace IMGCloud.Infrastructure.Requests
 {
-    public class UserDetailsRequest
+    public sealed class UserDetailsRequest
     {
+        public int Id { get; set; }
         public int UserId { get; set; }
-        public string? UserName { get; set; }
+        public string UserName { get; set; } = string.Empty;
         public string? FullName { get; set; }
 
         public string? PhoneNumber { get; set; }
-        public string? Birthday { get; set; }
+        public DateTime? Birthday { get; set; }
 
         public string? Photo { get; set; }
 
