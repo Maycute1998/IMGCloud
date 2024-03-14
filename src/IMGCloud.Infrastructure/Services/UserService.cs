@@ -114,7 +114,6 @@ namespace IMGCloud.Infrastructure.Services
         private Task<string?> GetExistedTokenAsync(int userId, CancellationToken cancellationToken)
         => _userTokenRepository.GetExistedTokenAsync(userId, cancellationToken);
 
-
         private Task StoreTokenAsync(UserTokenContext context, CancellationToken cancellationToken)
         => _userTokenRepository.StoreTokenAsync(context, cancellationToken);
 

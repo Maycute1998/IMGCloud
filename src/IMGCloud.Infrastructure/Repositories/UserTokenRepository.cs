@@ -28,7 +28,7 @@ public sealed class UserTokenRepository : RepositoryBase<UserToken, int>, IUserT
         await this.SaveChangesAsync(cancellationToken);
     }
 
-    private async Task StoreToken(UserTokenContext context, CancellationToken cancellationToken)
+    private async Task StoreTokenAsync(UserTokenContext context, CancellationToken cancellationToken)
     {
         try
         {
@@ -62,5 +62,5 @@ public sealed class UserTokenRepository : RepositoryBase<UserToken, int>, IUserT
     Task IUserTokenRepository.RemoveTokenAsync(int userId, CancellationToken cancellationToken)
     => this.RemoveTokenAsync(userId, cancellationToken);
     Task IUserTokenRepository.StoreTokenAsync(UserTokenContext context, CancellationToken cancellationToken)
-    => this.StoreToken(context, cancellationToken);
+    => this.StoreTokenAsync(context, cancellationToken);
 }
