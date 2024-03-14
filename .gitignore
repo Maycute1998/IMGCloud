@@ -281,3 +281,4 @@ src/**/app.yaml
 src/**/inf.yaml
 
 
+/src/**/appsettings.Development.json
