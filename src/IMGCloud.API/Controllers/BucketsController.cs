@@ -19,7 +19,13 @@ namespace IMGCloud.API.Controllers
         {
             var result = await service.UploadFileAsync(file, cancellationToken);
             return string.IsNullOrWhiteSpace(result) ? this.Ok(result) : this.BadRequest();
+        }
 
+        [HttpPost("upload-avatar")]
+        public async Task<IActionResult> UploadFileAsync([FromForm] string base64String, CancellationToken cancellationToken = default)
+        {
+            await service.UploadAvatarAsync(base64String, cancellationToken);
+            return this.Ok();
         }
 
         [HttpGet("get-all")]

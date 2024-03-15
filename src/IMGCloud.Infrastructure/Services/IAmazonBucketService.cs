@@ -6,6 +6,7 @@ namespace IMGCloud.Infrastructure.Services;
 
 public interface IAmazonBucketService
 {
+    Task UploadAvatarAsync(string base64String, CancellationToken cancellationToken = default);
     Task<string> UploadFileAsync(IFormFile file, CancellationToken cancellationToken = default);
     Task<IEnumerable<S3ObjectContext>> GetAllAsync(CancellationToken cancellationToken = default);
     Task<bool> IsExistedAsync();

@@ -93,7 +93,28 @@ public sealed class AmazonBucketService : IAmazonBucketService
 
         return string.Empty;
     }
+    
+    private async Task UploadAvatarAsync(string base64String, CancellationToken cancellationToken)
+    {
+        var isExistBucket = await IsExistedAsync();
+        if (isExistBucket)
+        {
+            var prefix = this.bulketOptions.Prefix;
+            base64String = base64String.Replace("data:image/png;base64,", "");
+            byte[] bytes = Convert.FromBase64String(base64String);
 
+            var request = new PutObjectRequest
+            {
+                BucketName = this.bulketOptions.BucketName,
+                Key = string.IsNullOrEmpty(prefix) ? "avatar.jpg" : $"{prefix?.TrimEnd('/')}/avatar.jpg",
+            };
+            using (var ms = new MemoryStream(bytes))
+            {
+                request.InputStream = ms;
+                await _s3Client.PutObjectAsync(request, cancellationToken);
+            }
+        }
+    }
 
     Task<string> IAmazonBucketService.UploadFileAsync(IFormFile file, CancellationToken cancellationToken)
     => this.UploadFileAsync(file, cancellationToken);
@@ -105,6 +126,8 @@ public sealed class AmazonBucketService : IAmazonBucketService
     => GetAsync(key, cancellationToken);
     Task IAmazonBucketService.DeleteAsync(string key, CancellationToken cancellationToken)
     => DeleteAsync(key, cancellationToken);
+    Task IAmazonBucketService.UploadAvatarAsync(string base64String, CancellationToken cancellationToken)
+    => UploadAvatarAsync(base64String, cancellationToken);
 }
 
 
