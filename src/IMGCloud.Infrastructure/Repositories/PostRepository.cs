@@ -3,8 +3,6 @@ using IMGCloud.Infrastructure.Context;
 using IMGCloud.Infrastructure.Extensions;
 using IMGCloud.Infrastructure.Requests;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Text.Json;
 
 namespace IMGCloud.Infrastructure.Repositories;
 
@@ -25,7 +23,7 @@ public sealed class PostRepository : RepositoryBase<Post, int>, IPostRepository
         throw new NotImplementedException();
     }
 
-    private async Task<List<PostContext>> GetAllPostsAsync(CancellationToken cancellationToken = default)
+    private async Task<List<PostContext>> GetAllPostsAsync(CancellationToken cancellationToken)
     {
         return await dbContext.Posts
             .Include(x => x.PostImages)
@@ -36,7 +34,7 @@ public sealed class PostRepository : RepositoryBase<Post, int>, IPostRepository
             {
                 UserName = post.Users!.UserName,
                 UserAvatar = post.Users.UserDetails!.Photo,
-                ImagePath = post.PostImages!.First().ImagePath
+                ImagePath = post.PostImages!.FirstOrDefault().ImagePath
             }.MapFor(post))
             .ToListAsync(cancellationToken);
     }
@@ -55,6 +53,26 @@ public sealed class PostRepository : RepositoryBase<Post, int>, IPostRepository
         return this.SaveChangesAsync(cancellationToken);
     }
 
+    private async Task<PostDetails?> GetByIdAsync(int id, CancellationToken cancellationToken)
+    {
+        var post = await dbContext.Posts
+            .Include(x => x.PostImages)
+            .Include(x => x.Users)
+                .ThenInclude(u => u.UserDetails)
+            .Include(x => x.Comments)
+            .Include(x => x.Collection)
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.Status == Status.Active && x.Id == id, cancellationToken);
+        return new PostDetails
+        {
+            UserName = post.Users!.UserName,
+            UserAvatar = post.Users.UserDetails!.Photo,
+            ImagePath = post.PostImages!.FirstOrDefault().ImagePath,
+            CollectionName = post.Collection!.CollectionName,
+            Comments = post.Comments!.Select(x => new CommentContext { Content = x.Content, UserId = x.UserId }).ToList(),
+        }.MapFor(post);
+    }
+
     Task IPostRepository.CreatePostAsync(CreatePostRequest post, CancellationToken cancellationToken)
     => this.CreatePostAsync(post, cancellationToken);
     Task IPostRepository.EditPostAsync(CreatePostRequest post, CancellationToken cancellationToken)
@@ -62,6 +80,9 @@ public sealed class PostRepository : RepositoryBase<Post, int>, IPostRepository
     Task IPostRepository.PressHeartAsync(CreatePostRequest post, CancellationToken cancellationToken)
     => this.PressHeartAsync(post, cancellationToken);
 
-    Task<List<PostContext>> IPostRepository.GetAllPostsAsync(CancellationToken cancellationToken = default)
+    Task<List<PostContext>> IPostRepository.GetAllPostsAsync(CancellationToken cancellationToken)
     => this.GetAllPostsAsync(cancellationToken);
+
+    Task<PostDetails?> IPostRepository.GetByIdAsync(int id, CancellationToken cancellationToken)
+    => this.GetByIdAsync(id, cancellationToken);
 }

@@ -14,10 +14,15 @@ public class PostService : IPostService
         _postRepository = postRepository;
     }
 
+    private Task<PostDetails?> GetByIdAsync(int id, CancellationToken cancellationToken)
+    => _postRepository.GetByIdAsync(id, cancellationToken);
 
-    private Task<List<PostContext>> GetAllPostsAsync(CancellationToken cancellationToken = default)
+    private Task<List<PostContext>> GetAllPostsAsync(CancellationToken cancellationToken)
     => _postRepository.GetAllPostsAsync(cancellationToken);
 
     Task<List<PostContext>>IPostService.GetAllPostsAsync(CancellationToken cancellationToken)
     =>this.GetAllPostsAsync(cancellationToken);
+
+    Task<PostDetails?> IPostService.GetByIdAsync(int id, CancellationToken cancellationToken)
+    => this.GetByIdAsync(id, cancellationToken);
 }
