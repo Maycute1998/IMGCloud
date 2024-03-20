@@ -24,12 +24,7 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> SigInAsync([FromBody] SignInContext model, CancellationToken cancellationToken = default)
     {
         var data = await _authService.SignInAsync(model, cancellationToken);
-
-        return Ok(new AuthencationApiResult()
-        {
-            Token = data.Token,
-            IsSucceeded = true
-        });
+        return Ok(data);
     }
 
     [HttpPost]

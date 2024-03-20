@@ -3,6 +3,7 @@ using IMGCloud.Domain.Entities;
 using IMGCloud.Infrastructure.Context;
 using IMGCloud.Infrastructure.Requests;
 using IMGCloud.Infrastructure.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IMGCloud.API.Controllers;
@@ -19,6 +20,7 @@ public sealed class UsersController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize]
     public async Task<IActionResult> GetUserByNameAsync(string name, CancellationToken cancellationToken = default)
     {
         var data = await _userService.GetUserDetailByUserNameAsync(name, cancellationToken);

@@ -31,9 +31,9 @@ public class AuthenticationService : IAuthenticationService
         this.tokenOptions = tokenOptions;
     }
 
-    private async Task<AuthencationResult> SignInAsync(SignInContext model, CancellationToken cancellationToken)
+    private async Task<AuthencationApiResult> SignInAsync(SignInContext model, CancellationToken cancellationToken)
     {
-        var result = new AuthencationResult();
+        var result = new AuthencationApiResult();
         var tokenBuilder = new JwtTokenBuilder();
         tokenBuilder
                .AddSecurityKey(JwtSecurityKey.Create(this.tokenOptions.SecurityKey))
@@ -86,6 +86,13 @@ public class AuthenticationService : IAuthenticationService
                 await StoreTokenAsync(model.UserName, result.Token, expDate);
 
             }
+            result.IsSucceeded = true;
+        }
+        else
+        {
+            result.Message = "User is not existed";
+            result.IsSucceeded = false;
+            result.Token = string.Empty;
         }
         return result;
     }
@@ -146,7 +153,7 @@ public class AuthenticationService : IAuthenticationService
     Task IAuthenticationService.SignUpAsync(CreateUserRequest model, CancellationToken cancellationToken)
     => this.SignUpAsync(model, cancellationToken);
 
-    Task<AuthencationResult> IAuthenticationService.SignInAsync(SignInContext model, CancellationToken cancellationToken)
+    Task<AuthencationApiResult> IAuthenticationService.SignInAsync(SignInContext model, CancellationToken cancellationToken)
     => SignInAsync(model, cancellationToken);
 
     Task IAuthenticationService.SignOutAsync(CancellationToken cancellationToken)
