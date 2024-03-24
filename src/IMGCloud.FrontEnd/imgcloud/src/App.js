@@ -1,7 +1,7 @@
+import React from "react";
+import "./App.scss";
 import Home from "./containers/home";
 import Navigation from "./containers/navigation";
-import "./App.scss";
-
 function App() {
   return (
     <div className="App">
@@ -9,6 +9,7 @@ function App() {
       <div className="container">
         <Home />
       </div>
+      
     </div>
   );
 }

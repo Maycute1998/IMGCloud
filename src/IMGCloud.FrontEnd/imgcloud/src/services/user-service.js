@@ -20,5 +20,11 @@ const createUserInfo = async (userInfo) => {
   return axios.post("users/create", userInfo);
 };
 
-export { createUserInfo, getUserDetailsByName, login, register };
+const forgotPassword = async (email) => {
+  return axios.post("forgot-password", email);
+};
+
+
+
+export { createUserInfo, forgotPassword, getUserDetailsByName, login, register };
 

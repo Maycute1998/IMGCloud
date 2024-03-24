@@ -1,9 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Ok } from "../../const/constant";
+import { Error, Ok } from "../../const/constant";
 import { getAllPosts } from "../../services/post-service";
+import { LoadingOverlayContext } from "../../stores/context/loading-overlay/loading-overlay-context";
+import { SnackbarContext } from "../../stores/context/snackbar-context";
 import "./post.scss";
 const Post = () => {
   const [posts, setPosts] = useState(null);
+  const { showLoading } = React.useContext(LoadingOverlayContext);
+  const { handleShowAlert, handleMessage, handleSeverity } =
+    React.useContext(SnackbarContext);
 
   async function fetchPost() {
     try {
@@ -12,26 +17,26 @@ const Post = () => {
         return response.data;
       }
     } catch (error) {
-      console.error("Error fetching data:", error);
+      handleSeverity(Error)
+      handleMessage(`${error}`);
+      handleShowAlert(true);
     }
   }
 
   useEffect(() => {
+    showLoading(true);
     fetchPost()
       .then((res) => {
         if (res) {
           setPosts(res);
         }
       })
-      .catch((error) => {
-        // Handle errors
-        console.error("Error fetching data:", error);
+      .finally(() => {
+        showLoading(false);
       });
   }, []);
 
-  function handleClickImage() {
-
-  } 
+  function handleClickImage() {}
 
   return (
     <>
@@ -50,7 +55,7 @@ const Post = () => {
                   <img
                     className="avatar"
                     alt={post.caption}
-                    src={post.userAvatar}  
+                    src={post.userAvatar}
                   />
                   <div className="user-details">
                     <span className="user-name">{post.userName}</span>
