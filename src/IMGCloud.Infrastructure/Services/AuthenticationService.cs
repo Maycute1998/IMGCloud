@@ -13,9 +13,10 @@ namespace IMGCloud.Infrastructure.Services;
 public class AuthenticationService : IAuthenticationService
 {
     private readonly IUserService _userService;
-    private readonly ILogger<AuthenticationService> _logger;
     private readonly ICacheService _redisCache;
     private readonly TokenOptions tokenOptions;
+    private readonly IStringLocalizer<AuthenticationService> _stringLocalizer;
+    private readonly ILogger<AuthenticationService> _logger;
 
     public AuthenticationService(
           ILogger<AuthenticationService> logger
@@ -29,6 +30,7 @@ public class AuthenticationService : IAuthenticationService
         _userService = userService;
         _redisCache = redisCache;
         this.tokenOptions = tokenOptions;
+        _stringLocalizer = stringLocalizer;
     }
 
     private async Task<AuthencationApiResult> SignInAsync(SignInContext model, CancellationToken cancellationToken)
@@ -90,7 +92,7 @@ public class AuthenticationService : IAuthenticationService
         }
         else
         {
-            result.Message = "User is not existed";
+            result.Message = _stringLocalizer["incorrectUserNameOrPassword"].ToString(); ;
             result.IsSucceeded = false;
             result.Token = string.Empty;
         }

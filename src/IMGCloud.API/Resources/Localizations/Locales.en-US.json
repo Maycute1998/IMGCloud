@@ -21,5 +21,6 @@
   "RegisterFailed": "Register Failed",
   "DataNotFound": "Data not found",
   "userNotFound": "User not found",
-  "userExisted": "User existed"
+  "userExisted": "User existed",
+  "incorrectUserNameOrPassword": "The username or password you entered is incorrect. Please try again."
 }

@@ -68,6 +68,7 @@ public static partial class WebApplicationExtensions
         services.AddScoped<IGoogleService, GoogleService>();
         services.AddScoped<ICacheService, CacheService>();
         services.AddScoped<IAmazonBucketService, AmazonBucketService>();
+        services.AddTransient<ISendMailService, SendMailService>();
     }
 
     internal static void AddApplicationOptions(this IServiceCollection services, IConfiguration configuration)
@@ -87,6 +88,10 @@ public static partial class WebApplicationExtensions
         var googleAuthenticationOptions = configuration.GetSection(nameof(GoogleAuthenticationOptions)).Get<GoogleAuthenticationOptions>();
         ArgumentNullException.ThrowIfNull(googleAuthenticationOptions);
         services.AddSingleton(googleAuthenticationOptions);
+
+        var mailOptions = configuration.GetSection(nameof(MailOptions)).Get<MailOptions>();
+        ArgumentNullException.ThrowIfNull(mailOptions);
+        services.AddSingleton(mailOptions);
 
         services.AddControllers().AddJsonOptions(x =>
                 x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);

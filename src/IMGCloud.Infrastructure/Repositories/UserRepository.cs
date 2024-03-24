@@ -1,7 +1,10 @@
 ﻿using IMGCloud.Domain.Entities;
+using IMGCloud.Infrastructure.Context;
 using IMGCloud.Infrastructure.Extensions;
 using IMGCloud.Infrastructure.Requests;
+using IMGCloud.Utilities.PasswordHashExtension;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json.Linq;
 
 namespace IMGCloud.Infrastructure.Repositories;
 
@@ -59,6 +62,42 @@ public sealed class UserRepository : RepositoryBase<User, int>, IUserRepository
         }
     }
 
+    public async Task<string> ForgotPasswordAsync(string email, CancellationToken cancellationToken = default)
+    {
+        string resetToken = string.Empty;
+        var user = await dbContext.Users.SingleOrDefaultAsync(u => u.Email == email);
+        if (user is not null)
+        {
+            resetToken = Guid.NewGuid().ToString();
+
+            user.ResetPasswordToken = resetToken;
+            user.ResetPasswordTokenExpiration = DateTime.UtcNow.AddMinutes(5);
+
+            await dbContext.SaveChangesAsync(cancellationToken);
+        }
+        return resetToken;
+    }
+
+    public async Task ResetPasswordAsync(ResetPasswordContext context, CancellationToken cancellationToken = default)
+    {
+        var user = await dbContext.Users.SingleOrDefaultAsync(u => u.ResetPasswordToken == context.Token);
+
+        if (user is not null)
+        {
+            if (user.ResetPasswordTokenExpiration < DateTime.UtcNow)
+            {
+                user.Password = context.NewPassword.ToHashPassword();
+                user.ResetPasswordToken = null;
+                user.ResetPasswordTokenExpiration = null;
+                await dbContext.SaveChangesAsync(cancellationToken);
+            }
+            else
+            {
+                throw new Exception("Token expired");
+            }
+        }
+    }
+
     Task IUserRepository.CreateUserAsync(CreateUserRequest model, CancellationToken cancellationToken)
     => this.CreateUserAsync(model, cancellationToken);
     Task<User?> IUserRepository.GetUserByUserNameAsync(string userName, CancellationToken cancellationToken)
@@ -72,4 +111,10 @@ public sealed class UserRepository : RepositoryBase<User, int>, IUserRepository
 
     Task IUserRepository.CreateUserDetailAsync(UserDetailsRequest userInfo, CancellationToken cancellationToken)
     =>this.CreateUserDetailAsync(userInfo, cancellationToken);
+
+    Task<string> IUserRepository.ForgotPasswordAsync(string email, CancellationToken cancellationToken)
+    => this.ForgotPasswordAsync(email, cancellationToken);
+
+    Task IUserRepository.ResetPasswordAsync(ResetPasswordContext context, CancellationToken cancellationToken)
+    => this.ResetPasswordAsync(context, cancellationToken);
 }

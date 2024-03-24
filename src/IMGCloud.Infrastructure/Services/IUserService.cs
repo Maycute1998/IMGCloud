@@ -16,4 +16,6 @@ public interface IUserService
     Task<UserDetail?> GetUserByIdAsync(int id, CancellationToken cancellationToken = default);
     Task<bool> IsExistEmailAsync(string email, CancellationToken cancellationToken = default);
     Task CreateUserDetailAsync(UserDetailsRequest userDetail, CancellationToken cancellationToken = default);
+    Task<string> ForgotPasswordAsync(string email, CancellationToken cancellationToken = default);
+    Task ResetPasswordAsync(ResetPasswordContext context, CancellationToken cancellationToken = default);
 }

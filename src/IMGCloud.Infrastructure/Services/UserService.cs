@@ -4,8 +4,10 @@ using IMGCloud.Infrastructure.Repositories;
 using IMGCloud.Infrastructure.Requests;
 using IMGCloud.Utilities.PasswordHashExtension;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Linq;
 
 namespace IMGCloud.Infrastructure.Services
 {
@@ -99,6 +101,12 @@ namespace IMGCloud.Infrastructure.Services
         private Task<UserDetail?> GetUserByIdAsync(int id, CancellationToken cancellationToken)
         => _userDetailRepository.GetByUserIdAsync(id, cancellationToken);
 
+        private Task<string> ForgotPasswordAsync(string email, CancellationToken cancellationToken = default)
+        => _userRepository.ForgotPasswordAsync(email, cancellationToken);
+
+        private Task ResetPasswordAsync(ResetPasswordContext context, CancellationToken cancellationToken = default)
+        =>_userRepository.ResetPasswordAsync(context, cancellationToken);
+
         #region Implementation of IUserService
         Task<bool> IUserService.IsExistEmailAsync(string email, CancellationToken cancellationToken)
         => this.IsExistEmailAsync(email, cancellationToken);
@@ -120,8 +128,11 @@ namespace IMGCloud.Infrastructure.Services
         => this.CreateUserAsync(model, cancellationToken);
         Task<UserDetailContext?> IUserService.GetUserDetailByUserNameAsync(string userName, CancellationToken cancellationToken)
         => this.GetUserDetailByUserNameAsync(userName, cancellationToken);
+        Task<string> IUserService.ForgotPasswordAsync(string email, CancellationToken cancellationToken = default)
+        => this.ForgotPasswordAsync(email, cancellationToken);
+        Task IUserService.ResetPasswordAsync(ResetPasswordContext context, CancellationToken cancellationToken = default)
+        => this.ResetPasswordAsync(context, cancellationToken);
         #endregion
-
     }
 }
 
