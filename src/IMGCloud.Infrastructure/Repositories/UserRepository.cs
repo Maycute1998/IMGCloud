@@ -1,5 +1,4 @@
 ﻿using IMGCloud.Domain.Entities;
-using IMGCloud.Infrastructure.Context;
 using IMGCloud.Infrastructure.Extensions;
 using IMGCloud.Infrastructure.Requests;
 using IMGCloud.Utilities.PasswordHashExtension;
@@ -78,7 +77,7 @@ public sealed class UserRepository : RepositoryBase<User, int>, IUserRepository
         return resetToken;
     }
 
-    public async Task ResetPasswordAsync(ResetPasswordContext context, CancellationToken cancellationToken = default)
+    public async Task ResetPasswordAsync(ResetPasswordRequest context, CancellationToken cancellationToken = default)
     {
         var user = await dbContext.Users.SingleOrDefaultAsync(u => u.ResetPasswordToken == context.Token);
 
@@ -115,6 +114,6 @@ public sealed class UserRepository : RepositoryBase<User, int>, IUserRepository
     Task<string> IUserRepository.ForgotPasswordAsync(string email, CancellationToken cancellationToken)
     => this.ForgotPasswordAsync(email, cancellationToken);
 
-    Task IUserRepository.ResetPasswordAsync(ResetPasswordContext context, CancellationToken cancellationToken)
+    Task IUserRepository.ResetPasswordAsync(ResetPasswordRequest context, CancellationToken cancellationToken)
     => this.ResetPasswordAsync(context, cancellationToken);
 }

@@ -104,7 +104,7 @@ namespace IMGCloud.Infrastructure.Services
         private Task<string> ForgotPasswordAsync(string email, CancellationToken cancellationToken = default)
         => _userRepository.ForgotPasswordAsync(email, cancellationToken);
 
-        private Task ResetPasswordAsync(ResetPasswordContext context, CancellationToken cancellationToken = default)
+        private Task ResetPasswordAsync(ResetPasswordRequest context, CancellationToken cancellationToken = default)
         =>_userRepository.ResetPasswordAsync(context, cancellationToken);
 
         #region Implementation of IUserService
@@ -130,7 +130,7 @@ namespace IMGCloud.Infrastructure.Services
         => this.GetUserDetailByUserNameAsync(userName, cancellationToken);
         Task<string> IUserService.ForgotPasswordAsync(string email, CancellationToken cancellationToken = default)
         => this.ForgotPasswordAsync(email, cancellationToken);
-        Task IUserService.ResetPasswordAsync(ResetPasswordContext context, CancellationToken cancellationToken = default)
+        Task IUserService.ResetPasswordAsync(ResetPasswordRequest context, CancellationToken cancellationToken = default)
         => this.ResetPasswordAsync(context, cancellationToken);
         #endregion
     }

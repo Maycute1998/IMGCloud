@@ -1,5 +1,4 @@
 ﻿using IMGCloud.Domain.Entities;
-using IMGCloud.Infrastructure.Context;
 using IMGCloud.Infrastructure.Requests;
 
 namespace IMGCloud.Infrastructure.Repositories;
@@ -13,5 +12,5 @@ public interface IUserRepository
     Task<User?> GetUserByUserNameAsync(string userName, CancellationToken cancellationToken = default);
     Task CreateUserDetailAsync(UserDetailsRequest userInfo, CancellationToken cancellationToken = default);
     Task<string> ForgotPasswordAsync(string email, CancellationToken cancellationToken = default);
-    Task ResetPasswordAsync(ResetPasswordContext context, CancellationToken cancellationToken = default);
+    Task ResetPasswordAsync(ResetPasswordRequest context, CancellationToken cancellationToken = default);
 }
