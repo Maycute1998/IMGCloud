@@ -21,10 +21,12 @@ const createUserInfo = async (userInfo) => {
 };
 
 const forgotPassword = async (email) => {
-  return axios.post("forgot-password", email);
+  return axios.post("users/forgot-password?email="+ email);
 };
 
+const resetPassword = async (resetPasswordRequest) => {
+  return axios.post("users/reset-password", resetPasswordRequest);
+};
 
-
-export { createUserInfo, forgotPassword, getUserDetailsByName, login, register };
+export { createUserInfo, forgotPassword, getUserDetailsByName, login, register, resetPassword };
 

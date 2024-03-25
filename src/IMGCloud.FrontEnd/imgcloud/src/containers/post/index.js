@@ -39,7 +39,7 @@ const Post = () => {
   function handleClickImage() {}
 
   return (
-    <>
+    <><div className="container">
       {posts &&
         posts.map((post) => {
           return (
@@ -66,6 +66,8 @@ const Post = () => {
             </div>
           );
         })}
+    </div>
+      
     </>
   );
 };

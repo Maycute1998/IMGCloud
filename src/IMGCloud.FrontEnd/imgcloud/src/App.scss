@@ -3,9 +3,8 @@
   padding: 0;
   box-sizing: border-box;
   font-family: "Poppins", sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    transition: 0.4s;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }   
 
 main {
@@ -15,7 +14,6 @@ main {
 
 .container {
   margin: 20px auto;
-  columns: 6;
   column-gap: 20px;
   padding: 20px;
 }

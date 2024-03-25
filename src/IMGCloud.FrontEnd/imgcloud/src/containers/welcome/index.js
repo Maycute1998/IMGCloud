@@ -1,10 +1,11 @@
 import * as React from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Error, Ok, TOKEN_KEY, USER_NAME } from "../../const/constant";
+import { Error, Ok, Success, TOKEN_KEY, USER_NAME } from "../../const/constant";
 import { login, register } from "../../services/user-service";
 import { LoadingOverlayContext } from "../../stores/context/loading-overlay/loading-overlay-context";
 import { SnackbarContext } from "../../stores/context/snackbar-context";
+import RecoverPassword from "./recover-password";
 import "./welcome.scss";
 
 const Welcome = () => {
@@ -13,6 +14,7 @@ const Welcome = () => {
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
 
   const navigate = useNavigate();
   const { showLoading } = React.useContext(LoadingOverlayContext);
@@ -29,10 +31,10 @@ const Welcome = () => {
           localStorage.setItem(TOKEN_KEY, res.data.token);
           localStorage.setItem(USER_NAME, username);
           navigate("/");
+          showAlert(Success, res.data.message, true);
+          
         } else {
-          handleSeverity(Error);
-          handleMessage(res.data.message);
-          handleShowAlert(true);
+          showAlert(Error, res.data.message, true);
         }
         showLoading(false);
       } else {
@@ -51,12 +53,13 @@ const Welcome = () => {
       }
     }
   };
-
-  const forgotPassword = (email) => {
-    if (email) {
-      forgotPassword(email);
+  const showAlert = (alertType, errorMsg, isShowAlert) => {
+    if (errorMsg) {
+      handleSeverity(alertType);
+      handleMessage(errorMsg);
+      handleShowAlert(isShowAlert);
     }
-  };
+  }
 
   const checkUserNameAndPassword = () => {
     if (username.trim() === "" || password.trim() === "") {
@@ -68,96 +71,105 @@ const Welcome = () => {
 
   return (
     <>
-      <div class="signin-container">
-        <div class="form-container sign-in">
-          <div class="form">
-            <div class="logo">
-              <img class="logo-image" src="/img/imgcloud-logo.png" alt="logo" />
-            </div>
-            <div class="social-icons">
-              <a href="#" class="icon">
-                <i class="fa-brands fa-google-plus-g"></i>
-              </a>
-              <a href="#" class="icon">
-                <i class="fa-brands fa-facebook-f"></i>
-              </a>
-              <a href="#" class="icon">
-                <i class="fa-brands fa-github"></i>
-              </a>
-              <a href="#" class="icon">
-                <i class="fa-brands fa-linkedin-in"></i>
-              </a>
-            </div>
-            <span>or use your email password</span>
-            {action === "login" ? (
-              <> </>
-            ) : (
+      {isForgotPassword ? (
+        <RecoverPassword />
+      ) : (
+        <div class="signin-container">
+          <div class="form-container sign-in">
+            <div class="form">
+              <div class="logo">
+                <img
+                  class="logo-image"
+                  src="/img/imgcloud-logo.png"
+                  alt="logo"
+                />
+              </div>
+              <div class="social-icons">
+                <a href="#" class="icon">
+                  <i class="fa-brands fa-google-plus-g"></i>
+                </a>
+                <a href="#" class="icon">
+                  <i class="fa-brands fa-facebook-f"></i>
+                </a>
+                <a href="#" class="icon">
+                  <i class="fa-brands fa-github"></i>
+                </a>
+                <a href="#" class="icon">
+                  <i class="fa-brands fa-linkedin-in"></i>
+                </a>
+              </div>
+              <span>or use your email password</span>
+              {action === "login" ? (
+                <> </>
+              ) : (
+                <input
+                  type="email"
+                  placeholder="Email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              )}
               <input
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                type="text"
+                placeholder="User name"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
               />
-            )}
-            <input
-              type="text"
-              placeholder="User name"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-            />
-
-            <input
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-            {errorMessage && <div style={{ color: "red" }}>{errorMessage}</div>}
-            <a href="#" onClick={() => setAction("forgotPassword")}>
-              Forget Your Password?
-            </a>
-            <button
-              type="submit"
-              class="btn btn-primary"
-              onClick={() => handleSignIn(action)}
-            >
-              {action === "login" ? "Sign In" : "Sign Up"}
-            </button>
+              <input
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              {errorMessage && (
+                <div style={{ color: "red" }}>{errorMessage}</div>
+              )}
+              <a href="#" onClick={() => setIsForgotPassword(true)}>
+                Forget Your Password?
+              </a>
+              <button
+                type="submit"
+                class="btn btn-primary"
+                onClick={() => handleSignIn(action)}
+              >
+                {action === "login" ? "Sign In" : "Sign Up"}
+              </button>
+            </div>
+          </div>
+          <div class="toggle-container">
+            <div class="toggle">
+              {action === "login" ? (
+                <div class="toggle-panel toggle-left">
+                  <h1>Hello, Friend!</h1>
+                  <p>
+                    Register with your personal details to use all of site
+                    features
+                  </p>
+                  <button
+                    class="hidden"
+                    id="register"
+                    onClick={() => setAction("signup")}
+                  >
+                    {action === "login" ? "Sign Up" : "Sign in"}
+                  </button>
+                </div>
+              ) : (
+                <div class="toggle-panel toggle-left">
+                  <h1>Welcome Back!</h1>
+                  <p>Enter your personal details to use all of site features</p>
+                  <button
+                    class="hidden"
+                    id="login"
+                    onClick={() => setAction("login")}
+                  >
+                    {action === "login" ? "Sign Up" : "Sign in"}
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
-        <div class="toggle-container">
-          <div class="toggle">
-            {action === "login" ? (
-              <div class="toggle-panel toggle-left">
-                <h1>Hello, Friend!</h1>
-                <p>
-                  Register with your personal details to use all of site
-                  features
-                </p>
-                <button
-                  class="hidden"
-                  id="register"
-                  onClick={() => setAction("signup")}
-                >
-                  {action === "login" ? "Sign Up" : "Sign in"}
-                </button>
-              </div>
-            ) : (
-              <div class="toggle-panel toggle-left">
-                <h1>Welcome Back!</h1>
-                <p>Enter your personal details to use all of site features</p>
-                <button
-                  class="hidden"
-                  id="login"
-                  onClick={() => setAction("login")}
-                >
-                  {action === "login" ? "Sign Up" : "Sign in"}
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
+      )}
     </>
   );
 };

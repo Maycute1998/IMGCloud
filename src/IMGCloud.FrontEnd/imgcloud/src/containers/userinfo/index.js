@@ -28,7 +28,7 @@ const UserInfo = () => {
     fullName: "",
     address: "",
     birthday: "",
-    imgSrc: "",
+    photo: "",
   });
   const [imgSrc, setImageSrc] = useState("");
   const navigate = useNavigate();
@@ -88,6 +88,7 @@ const UserInfo = () => {
   };
 
   const creatUserInfo = async () => {
+    setUserInfo({ ...userInfo, imgSrc: imgSrc });
     if (userInfo) {
       await createUserInfo(userInfo).then(async (res) => {
         if (res.status === Ok) {
@@ -96,6 +97,8 @@ const UserInfo = () => {
       });
     }
   };
+
+  
 
   return (
     <div className="user-info">
@@ -177,9 +180,15 @@ const UserInfo = () => {
                     selectedValue={selectedValue}
                     open={open}
                     onCloseUploadAvatar={handleCloseUploadAvatar}
-                    getPreviewValue={(value) => setImageSrc(value)}
+                    getPreviewValue={(value) => {
+                      setImageSrc(value)
+                      setUserInfo({ ...userInfo, photo: value });
+                    }}
                   />
-                  <img src={userInfo.imgSrc} alt="Preview" />
+                  <img
+                    src={imgSrc}
+                    alt="Preview"
+                  />
                 </div>
               </div>
             )}
