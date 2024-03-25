@@ -48,7 +48,7 @@ public sealed class UsersController : ControllerBase
 
     [HttpPost]
     [Route("reset-password")]
-    public async Task<IActionResult> ResetPassword(ResetPasswordRequest model)
+    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest model)
     {
         await _userService.ResetPasswordAsync(model);
         return Ok();

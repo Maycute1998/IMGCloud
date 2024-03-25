@@ -65,7 +65,7 @@ namespace IMGCloud.Infrastructure.Services
 
         public async Task SendResetPasswordEmail(string email, string resetToken)
         {
-            string resetPasswordLink = $"https://example.com/resetpassword?token={resetToken}";
+            string resetPasswordLink = $"http://localhost:3000/resetpassword?token={resetToken}";
 
             await SendMail(new MailContent()
             {

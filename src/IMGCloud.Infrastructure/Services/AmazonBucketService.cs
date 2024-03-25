@@ -36,7 +36,7 @@ public sealed class AmazonBucketService : IAmazonBucketService
             var request = new ListObjectsV2Request()
             {
                 BucketName = this.bulketOptions.BucketName,
-                Prefix = this.bulketOptions.Prefix
+                Prefix = this.bulketOptions.Prefix.Photos
             };
             var result = await _s3Client.ListObjectsV2Async(request, cancellationToken);
             return result.S3Objects.Select(s =>
@@ -74,50 +74,29 @@ public sealed class AmazonBucketService : IAmazonBucketService
         return AmazonS3Util.DoesS3BucketExistV2Async(_s3Client, this.bulketOptions.BucketName);
     }
 
-    private async Task<string> UploadFileAsync(IFormFile file, CancellationToken cancellationToken)
+    private async Task<string> UploadFileAsync(string base64String, bool isPost = true, CancellationToken cancellationToken)
     {
+        var photoUrl = string.Empty;
         var isExistBucket = await IsExistedAsync();
         if (isExistBucket)
         {
-            var prefix = this.bulketOptions.Prefix;
-            var request = new PutObjectRequest()
-            {
-                BucketName = this.bulketOptions.BucketName,
-                Key = string.IsNullOrEmpty(prefix) ? file.FileName : $"{prefix.TrimEnd('/')}/{file.FileName}",
-                InputStream = file.OpenReadStream()
-            };
-            request.Metadata.Add("Content-Type", file.ContentType);
-            await _s3Client.PutObjectAsync(request, cancellationToken);
-            return $"{prefix}/{file.FileName}";
-        }
-
-        return string.Empty;
-    }
-    
-    private async Task UploadAvatarAsync(string base64String, CancellationToken cancellationToken)
-    {
-        var isExistBucket = await IsExistedAsync();
-        if (isExistBucket)
-        {
-            var prefix = this.bulketOptions.Prefix;
+            var prefix = isPost? this.bulketOptions.Prefix.Photos : this.bulketOptions.Prefix.Avatars;
             base64String = base64String.Replace("data:image/png;base64,", "");
             byte[] bytes = Convert.FromBase64String(base64String);
 
             var request = new PutObjectRequest
             {
                 BucketName = this.bulketOptions.BucketName,
-                Key = string.IsNullOrEmpty(prefix) ? "avatar.jpg" : $"{prefix?.TrimEnd('/')}/avatar.jpg",
+                Key = string.IsNullOrEmpty(prefix) ? $"{Guid.NewGuid()}.jpg" : $"{prefix?.TrimEnd('/')}/{Guid.NewGuid()}.jpg",
             };
-            using (var ms = new MemoryStream(bytes))
-            {
-                request.InputStream = ms;
-                await _s3Client.PutObjectAsync(request, cancellationToken);
-            }
+            using var ms = new MemoryStream(bytes);
+            request.InputStream = ms;
+            await _s3Client.PutObjectAsync(request, cancellationToken);
+            photoUrl = $"https://{request.BucketName}.s3.{this.bulketOptions.Region}.amazonaws.com/{request.Key}";
         }
+        return photoUrl;
     }
 
-    Task<string> IAmazonBucketService.UploadFileAsync(IFormFile file, CancellationToken cancellationToken)
-    => this.UploadFileAsync(file, cancellationToken);
     Task<IEnumerable<S3ObjectContext>> IAmazonBucketService.GetAllAsync(CancellationToken cancellationToken)
     => this.GetAllAsync(cancellationToken);
     Task<bool> IAmazonBucketService.IsExistedAsync()
@@ -126,8 +105,8 @@ public sealed class AmazonBucketService : IAmazonBucketService
     => GetAsync(key, cancellationToken);
     Task IAmazonBucketService.DeleteAsync(string key, CancellationToken cancellationToken)
     => DeleteAsync(key, cancellationToken);
-    Task IAmazonBucketService.UploadAvatarAsync(string base64String, CancellationToken cancellationToken)
-    => UploadAvatarAsync(base64String, cancellationToken);
+    Task<string> IAmazonBucketService.UploadFileAsync(string base64String, bool isPost, CancellationToken cancellationToken)
+    => UploadFileAsync(base64String, isPost, cancellationToken);
 }
 
 

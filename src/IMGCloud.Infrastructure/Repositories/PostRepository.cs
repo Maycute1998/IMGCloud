@@ -41,14 +41,13 @@ public sealed class PostRepository : RepositoryBase<Post, int>, IPostRepository
 
     private Task CreatePostAsync(CreatePostRequest post, CancellationToken cancellationToken)
     {
-        this.dbContext.Posts.Add(new()
+        var postImage = new PostImage
         {
-            Caption = post.Caption,
-            CollectionId = post.CollectionId,
-            Emotion = post.Emotion,
-            Location = post.Location,
-            PostPrivacy = post.PostPrivacy
-        });
+            ImagePath = post.ImagePath
+        };
+        var postEnity = new Post();
+        this.dbContext.PostImages.Add(postImage);
+        this.dbContext.Posts.Add(postEnity).MapFor(post);
 
         return this.SaveChangesAsync(cancellationToken);
     }

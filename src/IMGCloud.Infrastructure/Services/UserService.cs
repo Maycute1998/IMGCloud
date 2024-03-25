@@ -19,6 +19,7 @@ namespace IMGCloud.Infrastructure.Services
         private readonly IUserDetailRepository _userDetailRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IStringLocalizer<UserService> _stringLocalizer;
+        private readonly IAmazonBucketService _amazonBucketService;
 
         public string? GetCurrentUserName
         {
@@ -38,7 +39,8 @@ namespace IMGCloud.Infrastructure.Services
             IUserRepository userRepository,
             IUserTokenRepository userTokenRepository,
             IUserDetailRepository userDetailRepository,
-            IHttpContextAccessor httpContextAccessor)
+            IHttpContextAccessor httpContextAccessor,
+            IAmazonBucketService amazonBucketService)
         {
             _logger = logger;
             _userRepository = userRepository;
@@ -46,6 +48,7 @@ namespace IMGCloud.Infrastructure.Services
             _userDetailRepository = userDetailRepository;
             _httpContextAccessor = httpContextAccessor;
             _stringLocalizer = stringLocalizer;
+            _amazonBucketService = amazonBucketService;
         }
 
         private async Task CreateUserAsync(CreateUserRequest model, CancellationToken cancellationToken)
@@ -62,8 +65,14 @@ namespace IMGCloud.Infrastructure.Services
         private Task<UserDetailContext?> GetUserDetailByUserNameAsync(string userName, CancellationToken cancellationToken)
         => _userDetailRepository.GetByUserNameAsync(userName, cancellationToken);
 
-        private Task CreateUserDetailAsync(UserDetailsRequest userInfo, CancellationToken cancellationToken = default)
-        => _userRepository.CreateUserDetailAsync(userInfo, cancellationToken);
+        private async Task CreateUserDetailAsync(UserDetailsRequest userInfo, CancellationToken cancellationToken = default)
+        {
+
+            var photoUrl = await _amazonBucketService.UploadFileAsync(userInfo.Photo, false, cancellationToken);
+            userInfo.Photo = photoUrl;
+
+            await _userRepository.CreateUserDetailAsync(userInfo, cancellationToken);
+        }
 
         public async Task<bool> IsActiveUserAsync(SignInContext model, CancellationToken cancellationToken)
         {

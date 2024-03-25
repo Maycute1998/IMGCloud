@@ -24,7 +24,8 @@ public sealed class UserDetailRepository : RepositoryBase<UserDetail, int>, IUse
             .FirstOrDefaultAsync(x => x.User!.UserName == userName,cancellationToken);
         return new UserDetailContext
         {
-            UserName = data.User!.UserName
+            UserName = data.User!.UserName,
+            Email = data.User.Email,
         }.MapFor(data);
     }
 

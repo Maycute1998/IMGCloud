@@ -1,5 +1,6 @@
 ﻿using IMGCloud.Domain.Cores;
 using IMGCloud.Domain.Entities;
+using IMGCloud.Infrastructure.Requests;
 using IMGCloud.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -36,7 +37,14 @@ public sealed class PostsController : ControllerBase
     {
         var respone = await _postService.GetByIdAsync(id, cancellationToken);
         return Ok(respone);
+    }
 
+    [HttpPost]
+    [Route("create")]
+    public async Task<IActionResult> CreatePostAsync([FromBody] CreatePostRequest post, CancellationToken cancellationToken = default)
+    {
+        await _postService.CreateAsync(post, true, cancellationToken);
+        return Ok();
     }
 
 }

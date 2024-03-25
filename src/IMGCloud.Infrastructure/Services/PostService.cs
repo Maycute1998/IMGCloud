@@ -8,10 +8,12 @@ namespace IMGCloud.Infrastructure.Services;
 public class PostService : IPostService
 {
     private readonly IPostRepository _postRepository;
+    private readonly IAmazonBucketService _amazonBucketService;
 
-    public PostService(IPostRepository postRepository)
+    public PostService(IPostRepository postRepository, IAmazonBucketService amazonBucketService)
     {
         _postRepository = postRepository;
+        _amazonBucketService = amazonBucketService;
     }
 
     private Task<PostDetails?> GetByIdAsync(int id, CancellationToken cancellationToken)
@@ -20,9 +22,18 @@ public class PostService : IPostService
     private Task<List<PostContext>> GetAllPostsAsync(CancellationToken cancellationToken)
     => _postRepository.GetAllPostsAsync(cancellationToken);
 
+    private async Task CreateAsync(CreatePostRequest post, bool isPost, CancellationToken cancellationToken = default)
+    {
+        var fileUrl = await _amazonBucketService.UploadFileAsync(post.ImagePath, isPost, cancellationToken);
+        await _postRepository.CreatePostAsync(post, cancellationToken);
+    }     
+
     Task<List<PostContext>>IPostService.GetAllPostsAsync(CancellationToken cancellationToken)
     =>this.GetAllPostsAsync(cancellationToken);
 
     Task<PostDetails?> IPostService.GetByIdAsync(int id, CancellationToken cancellationToken)
     => this.GetByIdAsync(id, cancellationToken);
+
+    Task IPostService.CreateAsync(CreatePostRequest post, bool isPost, CancellationToken cancellationToken)
+    => this.CreateAsync(post, isPost, cancellationToken);
 }
