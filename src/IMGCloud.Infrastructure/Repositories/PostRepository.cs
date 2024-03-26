@@ -72,6 +72,29 @@ public sealed class PostRepository : RepositoryBase<Post, int>, IPostRepository
         }.MapFor(post);
     }
 
+    private async Task<List<PostDetails>> GetByCollectionIdAsync(int id, CancellationToken cancellationToken)
+    {
+        return await dbContext.Posts
+                            .Include(x => x.PostImages)
+                            .Include(c => c.Collection)
+                            .Include(x => x.Users)
+                            .ThenInclude(x => x.UserDetails)
+                            .Where(x => x.Status == Status.Active && x.CollectionId == id)
+                            .Select(post => new PostDetails
+                            {
+                                Id = post.Id,
+                                Caption = post.Caption,
+                                Location= post.Location,
+                                CollectionName = post.Collection!.CollectionName,
+                                PostPrivacy = post.PostPrivacy,
+                                ImagePath = post.PostImages!.FirstOrDefault().ImagePath,
+                                UserName = post.Users!.UserName,
+                                UserAvatar = post.Users.UserDetails!.Photo
+                            }.MapFor(post))
+                            .ToListAsync(cancellationToken);
+
+    }
+
     Task IPostRepository.CreatePostAsync(CreatePostRequest post, CancellationToken cancellationToken)
     => this.CreatePostAsync(post, cancellationToken);
     Task IPostRepository.EditPostAsync(CreatePostRequest post, CancellationToken cancellationToken)
@@ -84,4 +107,7 @@ public sealed class PostRepository : RepositoryBase<Post, int>, IPostRepository
 
     Task<PostDetails?> IPostRepository.GetByIdAsync(int id, CancellationToken cancellationToken)
     => this.GetByIdAsync(id, cancellationToken);
+
+    Task<List<PostDetails>> IPostRepository.GetByCollectionIdAsync(int id, CancellationToken cancellationToken = default)
+    => this.GetByCollectionIdAsync(id, cancellationToken);
 }

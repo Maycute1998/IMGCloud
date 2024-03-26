@@ -26,13 +26,19 @@ public class PostService : IPostService
     {
         var fileUrl = await _amazonBucketService.UploadFileAsync(post.ImagePath, isPost, cancellationToken);
         await _postRepository.CreatePostAsync(post, cancellationToken);
-    }     
+    }
+
+    private async Task<List<PostDetails>> GetByCollectionIdAsync(int id, CancellationToken cancellationToken)
+    => await _postRepository.GetByCollectionIdAsync(id, cancellationToken);
 
     Task<List<PostContext>>IPostService.GetAllPostsAsync(CancellationToken cancellationToken)
     =>this.GetAllPostsAsync(cancellationToken);
 
     Task<PostDetails?> IPostService.GetByIdAsync(int id, CancellationToken cancellationToken)
     => this.GetByIdAsync(id, cancellationToken);
+
+    Task<List<PostDetails>> IPostService.GetByCollectionIdAsync(int id, CancellationToken cancellationToken)
+    => this.GetByCollectionIdAsync(id, cancellationToken);
 
     Task IPostService.CreateAsync(CreatePostRequest post, bool isPost, CancellationToken cancellationToken)
     => this.CreateAsync(post, isPost, cancellationToken);

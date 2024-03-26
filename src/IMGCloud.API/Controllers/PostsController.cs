@@ -14,16 +14,27 @@ namespace IMGCloud.API.Controllers;
 public sealed class PostsController : ControllerBase
 {
     private readonly IPostService _postService;
+    private readonly ICollectionService _collectionService;
 
 
-    public PostsController(IPostService postService)
+    public PostsController(IPostService postService, ICollectionService collectionService)
     {
         _postService = postService;
+        _collectionService = collectionService;
+    }
+
+    [HttpGet]
+    [Route("all-collections")]
+    public async Task<IActionResult> GetAllCollectionsAsync(CancellationToken cancellationToken = default)
+    {
+        var respone = await _collectionService.GetAllCollectionsAsync(cancellationToken);
+        return Ok(respone);
+
     }
 
     //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [HttpGet]
-    [Route("all-post")]
+    [Route("all-posts")]
     public async Task<IActionResult> GetAllPostAsync(CancellationToken cancellationToken = default)
     {
         var respone = await _postService.GetAllPostsAsync(cancellationToken);
@@ -36,6 +47,14 @@ public sealed class PostsController : ControllerBase
     public async Task<IActionResult> GetPostByIdAsync(int id, CancellationToken cancellationToken = default)
     {
         var respone = await _postService.GetByIdAsync(id, cancellationToken);
+        return Ok(respone);
+    }
+
+    [HttpGet]
+    [Route("collection-id")]
+    public async Task<IActionResult> GetPostByCollectionIdAsync(int id, CancellationToken cancellationToken = default)
+    {
+        var respone = await _postService.GetByCollectionIdAsync(id, cancellationToken);
         return Ok(respone);
     }
 

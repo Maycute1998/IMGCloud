@@ -11,4 +11,5 @@ public interface IPostRepository
     Task EditPostAsync(CreatePostRequest post, CancellationToken cancellationToken = default);
     Task PressHeartAsync(CreatePostRequest post, CancellationToken cancellationToken = default);
     Task<PostDetails?> GetByIdAsync(int id, CancellationToken cancellationToken = default);
+    Task<List<PostDetails>> GetByCollectionIdAsync(int id, CancellationToken cancellationToken = default);
 }
