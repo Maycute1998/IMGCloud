@@ -58,11 +58,13 @@ public static partial class WebApplicationExtensions
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IUserTokenRepository, UserTokenRepository>();
         services.AddScoped<IUserDetailRepository, UserDetailRepository>();
+        services.AddScoped<ICollectionRepository, CollectionRepository>();
     }
 
     internal static void AddServiceApplication(this IServiceCollection services)
     {
         services.AddScoped<IPostService, PostService>();
+        services.AddScoped<ICollectionService, CollectionService>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IAuthenticationService, AuthenticationService>();
         services.AddScoped<IGoogleService, GoogleService>();
