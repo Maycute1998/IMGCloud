@@ -39,11 +39,11 @@ public sealed class PostRepository : RepositoryBase<Post, int>, IPostRepository
             .ToListAsync(cancellationToken);
     }
 
-    private Task CreatePostAsync(CreatePostRequest post, CancellationToken cancellationToken)
+    private Task CreatePostAsync(CreatePostRequest post, string imgUrl, CancellationToken cancellationToken)
     {
         var postImage = new PostImage
         {
-            ImagePath = post.ImagePath
+            ImagePath = imgUrl
         };
         var postEnity = new Post();
         this.dbContext.PostImages.Add(postImage);
@@ -95,8 +95,8 @@ public sealed class PostRepository : RepositoryBase<Post, int>, IPostRepository
 
     }
 
-    Task IPostRepository.CreatePostAsync(CreatePostRequest post, CancellationToken cancellationToken)
-    => this.CreatePostAsync(post, cancellationToken);
+    Task IPostRepository.CreatePostAsync(CreatePostRequest post, string imgUrl, CancellationToken cancellationToken)
+    => this.CreatePostAsync(post, imgUrl, cancellationToken);
     Task IPostRepository.EditPostAsync(CreatePostRequest post, CancellationToken cancellationToken)
     => this.EditPostAsync(post, cancellationToken);
     Task IPostRepository.PressHeartAsync(CreatePostRequest post, CancellationToken cancellationToken)

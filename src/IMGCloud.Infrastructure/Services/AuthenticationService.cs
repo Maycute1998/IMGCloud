@@ -3,10 +3,12 @@ using IMGCloud.Domain.Options;
 using IMGCloud.Infrastructure.Builders;
 using IMGCloud.Infrastructure.Context;
 using IMGCloud.Infrastructure.Requests;
+using IMGCloud.Utilities.PasswordHashExtension;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using System.IdentityModel.Tokens.Jwt;
+using static Amazon.S3.Util.S3EventNotification;
 
 namespace IMGCloud.Infrastructure.Services;
 
@@ -45,54 +47,61 @@ public class AuthenticationService : IAuthenticationService
                .AddClaim(this.tokenOptions.ClaimKey, this.tokenOptions.ClaimValue)
                .AddUserName(model.UserName)
                .AddExpiryDate(this.tokenOptions.Expiry);
-        var isExistUser = await _userService.IsActiveUserAsync(model, cancellationToken);
-        if (isExistUser)
+
+        var user = await _userService.GetUserByUserNameAsync(model.UserName, cancellationToken);
+        if (user is not null)
         {
-            var user = await _userService.GetUserByUserNameAsync(model.UserName, cancellationToken);
-            var existedUserToken = await _userService.GetExistedTokenAsync(user.Id, cancellationToken);
-            if (!string.IsNullOrWhiteSpace(existedUserToken))
+            var isCorrectPassword = model.Password.VerifyPassword(user.Password);
+            if (!isCorrectPassword)
             {
-
-                var oldclaimsData = tokenBuilder.GetPrincipalFromExpiredToken(tokenOptions, existedUserToken);
-                var expiryDate = long.Parse(oldclaimsData.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Exp).Value);
-                var expDate = UnixTimeStampToDateTime(expiryDate);
-
-                if (oldclaimsData is not null)
+                result.IsSucceeded = false;
+                result.Message = _stringLocalizer["incorrectUserNameOrPassword"];
+                return result;
+            }
+            else
+            {
+                var existedUserToken = await _userService.GetExistedTokenAsync(user.Id, cancellationToken);
+                if (!string.IsNullOrWhiteSpace(existedUserToken))
                 {
-                    var existedToken = IsExistedTokenExpired(existedUserToken, expDate);
-                    // Case A: User is existed and token is not expired
-                    if (!existedToken)
+
+                    var oldclaimsData = tokenBuilder.GetPrincipalFromExpiredToken(tokenOptions, existedUserToken);
+                    var expiryDate = long.Parse(oldclaimsData.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Exp).Value);
+                    var expDate = UnixTimeStampToDateTime(expiryDate);
+
+                    if (oldclaimsData is not null)
                     {
-                        result.Token = existedUserToken;
+                        var existedToken = IsExistedTokenExpired(existedUserToken, expDate);
+                        if (!existedToken)
+                        {
+                            result.Token = existedUserToken;
+                        }
+                        else
+                        {
+                            result.Token = tokenBuilder.GenerateAccessToken(true).Value;
+                            await StoreTokenAsync(model.UserName, result.Token, expDate);
+                        }
                     }
                     else
                     {
                         result.Token = tokenBuilder.GenerateAccessToken(true).Value;
+                        // Store new token to database
                         await StoreTokenAsync(model.UserName, result.Token, expDate);
                     }
                 }
                 else
                 {
                     result.Token = tokenBuilder.GenerateAccessToken(true).Value;
-                    // Store new token to database
+                    var newClaimsData = tokenBuilder.GetPrincipalFromExpiredToken(tokenOptions, result.Token);
+                    var expiryDate = long.Parse(newClaimsData.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Exp).Value);
+                    var expDate = UnixTimeStampToDateTime(expiryDate);
                     await StoreTokenAsync(model.UserName, result.Token, expDate);
                 }
+                result.IsSucceeded = true;
             }
-            else
-            {
-                result.Token = tokenBuilder.GenerateAccessToken(true).Value;
-                var newClaimsData = tokenBuilder.GetPrincipalFromExpiredToken(tokenOptions, result.Token);
-                var expiryDate = long.Parse(newClaimsData.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Exp).Value);
-                var expDate = UnixTimeStampToDateTime(expiryDate);
-
-                await StoreTokenAsync(model.UserName, result.Token, expDate);
-
-            }
-            result.IsSucceeded = true;
         }
         else
         {
-            result.Message = _stringLocalizer["incorrectUserNameOrPassword"].ToString(); ;
+            result.Message = _stringLocalizer["accountNotExist"].ToString();
             result.IsSucceeded = false;
             result.Token = string.Empty;
         }

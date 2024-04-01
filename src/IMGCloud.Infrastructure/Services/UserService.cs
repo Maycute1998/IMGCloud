@@ -53,13 +53,20 @@ namespace IMGCloud.Infrastructure.Services
 
         private async Task CreateUserAsync(CreateUserRequest model, CancellationToken cancellationToken)
         {
-            if (await _userRepository.IsExitsUserNameAsync(model.UserName!, cancellationToken)
-                || await _userRepository.IsExitsUserEmailAsync(model.Email, cancellationToken))
+            try
             {
-                throw new ArgumentException("User is existed");
-            }
+                if (await _userRepository.IsExitsUserNameAsync(model.UserName!, cancellationToken)
+                || await _userRepository.IsExitsUserEmailAsync(model.Email, cancellationToken))
+                {
+                    _logger.LogError(_stringLocalizer["RegisterFailed"]);
+                }
 
-            await _userRepository.CreateUserAsync(model, cancellationToken);
+                await _userRepository.CreateUserAsync(model, cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                throw new ArgumentException(ex.Message);
+            }
         }
 
         private Task<UserDetailContext?> GetUserDetailByUserNameAsync(string userName, CancellationToken cancellationToken)
@@ -77,17 +84,23 @@ namespace IMGCloud.Infrastructure.Services
         public async Task<bool> IsActiveUserAsync(SignInContext model, CancellationToken cancellationToken)
         {
             var entity = await _userRepository.GetUserByUserNameAsync(model.UserName!);
-            if (entity is null)
+            if(entity is not null && entity.Status == Status.Active)
             {
-                return false;
-            }
-            return model.Password.VerifyPassword(entity.Password);
+               var isCorrectPassword = model.Password.VerifyPassword(entity.Password);
+                if (!isCorrectPassword)
+                {
+                    _logger.LogError(_stringLocalizer["incorrectUserNameOrPassword"]);
+                    return false;
+                }
+                return true;
+            }    
+            return false;            
         }
 
         private Task<bool> IsExistEmailAsync(string email, CancellationToken cancellationToken)
         => _userRepository.IsExitsUserEmailAsync(email, cancellationToken);
 
-        private Task<User> GetUserIdByUserNameAsync(string userName, CancellationToken cancellationToken)
+        private Task<User> GetUserByUserNameAsync(string userName, CancellationToken cancellationToken)
         => _userRepository.GetUserByUserNameAsync(userName, cancellationToken);
 
         private Task<string?> GetExistedTokenAsync(int userId, CancellationToken cancellationToken)
@@ -122,7 +135,7 @@ namespace IMGCloud.Infrastructure.Services
         Task<UserDetail?> IUserService.GetUserByIdAsync(int id, CancellationToken cancellationToken)
         => this.GetUserByIdAsync(id, cancellationToken);
         Task<User> IUserService.GetUserByUserNameAsync(string userName, CancellationToken cancellationToken)
-        => this.GetUserIdByUserNameAsync(userName, cancellationToken);
+        => this.GetUserByUserNameAsync(userName, cancellationToken);
         Task<bool> IUserService.IsActiveUserAsync(SignInContext user, CancellationToken cancellationToken)
         => this.IsActiveUserAsync(user, cancellationToken);
         Task<string?> IUserService.GetExistedTokenAsync(int userId, CancellationToken cancellationToken)

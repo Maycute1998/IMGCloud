@@ -4,6 +4,8 @@ using Amazon.S3.Util;
 using IMGCloud.Domain.Options;
 using IMGCloud.Infrastructure.Context;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Logging;
 
 namespace IMGCloud.Infrastructure.Services;
 
@@ -11,10 +13,18 @@ public sealed class AmazonBucketService : IAmazonBucketService
 {
     private readonly IAmazonS3 _s3Client;
     private readonly AmazonBulketOptions bulketOptions;
-    public AmazonBucketService(IAmazonS3 s3Client, AmazonBulketOptions amazonBulketOptions)
+    private readonly ILogger<AmazonBucketService> _logger;
+    private readonly IStringLocalizer<UserService> _stringLocalizer;
+
+    public AmazonBucketService(IAmazonS3 s3Client, 
+        AmazonBulketOptions amazonBulketOptions, 
+        ILogger<AmazonBucketService> logger,
+        IStringLocalizer<UserService> stringLocalizer)
     {
         this._s3Client = s3Client;
         this.bulketOptions = amazonBulketOptions;
+        this._logger = logger;
+        this._stringLocalizer = stringLocalizer;
     }
 
     private async Task DeleteAsync(string key, CancellationToken cancellationToken)
@@ -74,9 +84,8 @@ public sealed class AmazonBucketService : IAmazonBucketService
         return AmazonS3Util.DoesS3BucketExistV2Async(_s3Client, this.bulketOptions.BucketName);
     }
 
-    private async Task<string> UploadFileAsync(string base64String, bool isPost = true, CancellationToken cancellationToken)
+    private async Task<string> UploadFileAsync(string base64String, bool isPost, CancellationToken cancellationToken)
     {
-        var photoUrl = string.Empty;
         var isExistBucket = await IsExistedAsync();
         if (isExistBucket)
         {
@@ -92,9 +101,13 @@ public sealed class AmazonBucketService : IAmazonBucketService
             using var ms = new MemoryStream(bytes);
             request.InputStream = ms;
             await _s3Client.PutObjectAsync(request, cancellationToken);
-            photoUrl = $"https://{request.BucketName}.s3.{this.bulketOptions.Region}.amazonaws.com/{request.Key}";
+            return $"https://{request.BucketName}.s3.{this.bulketOptions.Region}.amazonaws.com/{request.Key}";
         }
-        return photoUrl;
+        else
+        {
+            _logger.LogError(_stringLocalizer["UploadImageFailed"]);
+            return string.Empty;
+        }
     }
 
     Task<IEnumerable<S3ObjectContext>> IAmazonBucketService.GetAllAsync(CancellationToken cancellationToken)

@@ -2,6 +2,8 @@
 using IMGCloud.Infrastructure.Context;
 using IMGCloud.Infrastructure.Requests;
 using IMGCloud.Infrastructure.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IMGCloud.API.Controllers;
@@ -21,7 +23,7 @@ public class AuthController : ControllerBase
 
     [HttpPost]
     [Route("login")]
-    public async Task<IActionResult> SigInAsync([FromBody] SignInContext model, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> SignInAsync([FromBody] SignInContext model, CancellationToken cancellationToken = default)
     {
         var data = await _authService.SignInAsync(model, cancellationToken);
         return Ok(data);
@@ -47,6 +49,15 @@ public class AuthController : ControllerBase
                 Message = ex.Message,
             });
         }
+    }
+
+    [HttpPost]
+    [Route("signout")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    public async Task<IActionResult> SignOutAsync(CancellationToken cancellationToken = default)
+    {
+        await _authService.SignOutAsync(cancellationToken);
+        return Ok();
     }
 
     [HttpPost]

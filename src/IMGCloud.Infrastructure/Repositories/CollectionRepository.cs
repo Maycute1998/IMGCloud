@@ -18,11 +18,18 @@ namespace IMGCloud.Infrastructure.Repositories
         }
         private async Task<List<CollectionContext>> GetAllCollectionsAsync(CancellationToken cancellationToken)
         {
-            return await dbContext.Collections
+            try
+            {
+                return await dbContext.Collections
                 .Where(c => c.Status == Status.Active)
-                .Select(c => new CollectionContext { Id = c.Id}.MapFor(c))
+                .Select(c => new CollectionContext { Id = c.Id }.MapFor(c))
                 .Take(10)
                 .ToListAsync(cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                throw new ArgumentNullException(ex.Message);
+            }
         }
 
         Task<List<CollectionContext>> ICollectionRepository.GetAllCollectionsAsync(CancellationToken cancellationToken)
