@@ -17,7 +17,7 @@ const Post = () => {
         return response.data;
       }
     } catch (error) {
-      handleSeverity(Error)
+      handleSeverity(Error);
       handleMessage(`${error}`);
       handleShowAlert(true);
     }
@@ -39,35 +39,35 @@ const Post = () => {
   function handleClickImage() {}
 
   return (
-    <><div className="container">
-      {posts &&
-        posts.map((post) => {
-          return (
-            <div className="post">
-              <div className="box" key={post.id}>
-                <img
-                  className="image"
-                  alt=""
-                  src={post.imagePath}
-                  onClick={handleClickImage()}
-                />
-                <div className="user-img">
+    <>
+      <div className="container">
+        {posts &&
+          posts.map((post) => {
+            return (
+              <div className="post">
+                <div className="box" key={post.id}>
                   <img
-                    className="avatar"
-                    alt={post.caption}
-                    src={post.userAvatar}
+                    className="image"
+                    alt=""
+                    src={post.imagePath}
+                    onClick={handleClickImage()}
                   />
-                  <div className="user-details">
-                    <span className="user-name">{post.userName}</span>
-                    <span className="caption">{post.caption}</span>
+                  <div className="user-img">
+                    <img
+                      className="avatar"
+                      alt={post.caption}
+                      src={post.userAvatar}
+                    />
+                    <div className="user-details">
+                      <span className="user-name">{post.userName}</span>
+                      <span className="caption">{post.caption}</span>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
-    </div>
-      
+            );
+          })}
+      </div>
     </>
   );
 };

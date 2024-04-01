@@ -1,16 +1,21 @@
-import { PrintIcon, ShareIcon, SpeedDial, SpeedDialAction, SpeedDialIcon } from '@mui/icons-material';
+//import { ShareIcon, SpeedDial, SpeedDialAction, SpeedDialIcon } from '@mui/icons-material';
+import ShareIcon from '@mui/icons-material/Share';
+import SpeedDial from '@mui/material/SpeedDial';
+import SpeedDialAction from '@mui/material/SpeedDialAction';
+import SpeedDialIcon from '@mui/material/SpeedDialIcon';
 import React from "react";
+import Collection from '../collection';
 import Post from "../post";
 import CreatePost from "../post/create-post";
 import "./home.scss";
 const actions = [
-  { icon: <PrintIcon />, name: 'Print' },
   { icon: <ShareIcon />, name: 'Share' },
 ];
 const Home = () => {
   const [isPost, setIsPost] = React.useState(false);
   return (
     <div>
+      <Collection/>
       {isPost ? <CreatePost /> : <Post />}
       <SpeedDial
         ariaLabel="SpeedDial basic example"

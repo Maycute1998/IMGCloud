@@ -15,11 +15,25 @@ const Welcome = () => {
   const [username, setUsername] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [isForgotPassword, setIsForgotPassword] = useState(false);
-
+  const [isValid, setIsValid] = useState(false);
   const navigate = useNavigate();
   const { showLoading } = React.useContext(LoadingOverlayContext);
   const { handleShowAlert, handleMessage, handleSeverity } =
     React.useContext(SnackbarContext);
+  
+    const validatePassword = (inputPassword) => {
+    // Check if password has at least 8 characters
+    const hasMinimumLength = inputPassword.length >= 8;
+
+    // Check if password contains at least one number
+    const hasNumber = /\d/.test(inputPassword);
+
+    // Check if password contains both uppercase and lowercase letters
+    const hasUppercase = /[A-Z]/.test(inputPassword);
+    const hasLowercase = /[a-z]/.test(inputPassword);
+
+    setIsValid(hasMinimumLength && hasNumber && hasUppercase && hasLowercase);
+  };
   const handleSignIn = async (action) => {
     checkUserNameAndPassword();
 
@@ -32,7 +46,6 @@ const Welcome = () => {
           localStorage.setItem(USER_NAME, username);
           navigate("/");
           showAlert(Success, res.data.message, true);
-          
         } else {
           showAlert(Error, res.data.message, true);
         }
@@ -59,7 +72,7 @@ const Welcome = () => {
       handleMessage(errorMsg);
       handleShowAlert(isShowAlert);
     }
-  }
+  };
 
   const checkUserNameAndPassword = () => {
     if (username.trim() === "" || password.trim() === "") {
@@ -67,6 +80,12 @@ const Welcome = () => {
     } else {
       setErrorMessage("");
     }
+  };
+
+  const handlePasswordChange = (e) => {
+    const password = e.target.value;
+    setPassword(password);
+    validatePassword(password);
   };
 
   return (
@@ -91,12 +110,6 @@ const Welcome = () => {
                 <a href="#" class="icon">
                   <i class="fa-brands fa-facebook-f"></i>
                 </a>
-                <a href="#" class="icon">
-                  <i class="fa-brands fa-github"></i>
-                </a>
-                <a href="#" class="icon">
-                  <i class="fa-brands fa-linkedin-in"></i>
-                </a>
               </div>
               <span>or use your email password</span>
               {action === "login" ? (
@@ -119,11 +132,13 @@ const Welcome = () => {
                 type="password"
                 placeholder="Password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={handlePasswordChange}
               />
               {errorMessage && (
                 <div style={{ color: "red" }}>{errorMessage}</div>
               )}
+              {action !== "login" && !isValid && 
+              <span style={{ color: "red" }}>Your password must have at least 8 characters and contain uppercase letters, lowercase letters and numbers.</span>}
               <a href="#" onClick={() => setIsForgotPassword(true)}>
                 Forget Your Password?
               </a>

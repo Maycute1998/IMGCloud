@@ -1,0 +1,67 @@
+.item-container {
+  position: relative;
+  width: 100%;
+  width: 345px;
+  height:400px;
+}
+
+.item-container :hover {
+  opacity: 0.5;
+  transition: 0.5s ease;
+}
+
+.image-item {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 1rem;
+}
+
+.overlay {
+  position: initial;
+  height: 100%;
+  width: 100%;
+  opacity: 0;
+  transition: 0.5s ease;
+}
+
+.item-container:hover .overlay {
+  opacity: 1;
+  cursor: pointer;
+}
+
+.text {
+  font-weight: 500;
+  color: white;
+  font-size: 25px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.swiper {
+  padding: 2%;
+  width: 100%;
+  height: 100%;
+}
+
+.swiper-slide {
+  text-align: center;
+  font-size: 18px;
+  background: #fff;
+
+  /* Center slide text vertically */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
