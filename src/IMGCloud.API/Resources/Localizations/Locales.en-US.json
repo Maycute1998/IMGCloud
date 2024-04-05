@@ -17,10 +17,13 @@
   "fullNameLimitStringLength": "FullName limit 255 character",
   "RegisterSuccessfully": "Register Successfully",
   "LoginSuccessfully": "Sigin Successfully",
-  "LoginFailed": "Sigin Failed",
+  "accountNotExist": "The account that you tried to reach does not exist.",
   "RegisterFailed": "Register Failed",
   "DataNotFound": "Data not found",
   "userNotFound": "User not found",
+  "userNameNotFound": "User name not found",
   "userExisted": "User existed",
-  "incorrectUserNameOrPassword": "The username or password you entered is incorrect. Please try again."
+  "incorrectUserNameOrPassword": "The username or password you entered is incorrect. Please try again.",
+  "uploadImageFailed": "Error when trying to upload image to Amazon S3 bucket"
+
 }

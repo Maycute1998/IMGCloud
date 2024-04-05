@@ -1,0 +1,139 @@
+{
+  "Routes": [
+    {
+      "DownstreamPathTemplate": "/Prod/api/Auth/login",
+      "UpstreamPathTemplate": "/signin",
+      "UpstreamHttpMethod": [ "POST" ],
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "e465pzbym9.execute-api.ap-southeast-2.amazonaws.com",
+          "Port": 443
+        }
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/Prod/api/Auth/register",
+      "UpstreamPathTemplate": "register",
+      "UpstreamHttpMethod": [ "POST" ],
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "e465pzbym9.execute-api.ap-southeast-2.amazonaws.com",
+          "Port": 443
+        }
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/Prod/api/Auth/google-signin",
+      "UpstreamPathTemplate": "google-signin",
+      "UpstreamHttpMethod": [ "POST" ],
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "e465pzbym9.execute-api.ap-southeast-2.amazonaws.com",
+          "Port": 443
+        }
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/Prod/api/Posts/all-collections",
+      "UpstreamPathTemplate": "all-collections",
+      "UpstreamHttpMethod": [ "GET" ],
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "e465pzbym9.execute-api.ap-southeast-2.amazonaws.com",
+          "Port": 443
+        }
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/Prod/api/Posts/all-posts",
+      "UpstreamPathTemplate": "all-posts",
+      "UpstreamHttpMethod": [ "GET" ],
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "e465pzbym9.execute-api.ap-southeast-2.amazonaws.com",
+          "Port": 443
+        }
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/Prod/api/Posts/id",
+      "UpstreamPathTemplate": "post/id",
+      "UpstreamHttpMethod": [ "GET" ],
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "e465pzbym9.execute-api.ap-southeast-2.amazonaws.com",
+          "Port": 443
+        }
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/Prod/api/Posts/collection-id",
+      "UpstreamPathTemplate": "post/collection-id",
+      "UpstreamHttpMethod": [ "GET" ],
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "e465pzbym9.execute-api.ap-southeast-2.amazonaws.com",
+          "Port": 443
+        }
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/Prod/api/Posts/create",
+      "UpstreamPathTemplate": "post/create",
+      "UpstreamHttpMethod": [ "POST" ],
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "e465pzbym9.execute-api.ap-southeast-2.amazonaws.com",
+          "Port": 443
+        }
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/Prod/api/Users/create",
+      "UpstreamPathTemplate": "user/create",
+      "UpstreamHttpMethod": [ "POST" ],
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "e465pzbym9.execute-api.ap-southeast-2.amazonaws.com",
+          "Port": 443
+        }
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/Prod/api/Users/forgot-password",
+      "UpstreamPathTemplate": "forgot-password",
+      "UpstreamHttpMethod": [ "POST" ],
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "e465pzbym9.execute-api.ap-southeast-2.amazonaws.com",
+          "Port": 443
+        }
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/Prod/api/Users/reset-password",
+      "UpstreamPathTemplate": "reset-password",
+      "UpstreamHttpMethod": [ "POST" ],
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "e465pzbym9.execute-api.ap-southeast-2.amazonaws.com",
+          "Port": 443
+        }
+      ]
+    }
+  ],
+  "GlobalConfiguration": {
+    "BaseUrl": "e465pzbym9.execute-api.ap-southeast-2.amazonaws.com/Prod"
+  }
+}

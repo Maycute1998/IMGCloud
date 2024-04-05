@@ -46,6 +46,8 @@ public static partial class WebApplicationExtensions
         builder.Services.ConfigureSwagger();
         builder.Services.ConfigureCors();
 
+        builder.Services.AddAWSLambdaHosting(LambdaEventSource.RestApi);
+
         return builder.Build();
     }
 
