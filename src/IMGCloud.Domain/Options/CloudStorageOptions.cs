@@ -9,6 +9,12 @@ public sealed class AmazonBulketOptions
     public string Region { get; set; } = "ap-southeast-2";
 }
 
+public sealed class GoogleCloudOptions 
+{
+    public string BucketName { get; set; } = "imgcloud-storage";
+    public PrefixOptions Prefix { get; set; } = new();
+}
+
 public sealed class PrefixOptions
 {
     public string Photos { get; set; } = "photos";

@@ -1,15 +1,15 @@
 import axios from "./axios";
 
 const getAllPosts = async () => {
-  return axios.get("/posts/all-posts");
+  return axios.get("/post/all-posts");
 };
 
 const getAllCollections = async () => {
-  return axios.get("/posts/all-collections");
+  return axios.get("/post/all-collections");
 };
 
 const getByCollectionId = async (id) => {
-  return axios.get("/posts/collection-id?id="+id);
+  return axios.get("/post/collection-id?id="+id);
 };
 
 

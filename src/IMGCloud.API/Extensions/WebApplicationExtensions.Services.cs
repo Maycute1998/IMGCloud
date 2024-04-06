@@ -72,6 +72,7 @@ public static partial class WebApplicationExtensions
         services.AddScoped<IGoogleService, GoogleService>();
         services.AddScoped<ICacheService, CacheService>();
         services.AddScoped<IAmazonBucketService, AmazonBucketService>();
+        services.AddScoped<IGoogleCloudService, GoogleCloudService>();
         services.AddTransient<ISendMailService, SendMailService>();
     }
 
@@ -80,6 +81,10 @@ public static partial class WebApplicationExtensions
         var amazonBulket = configuration.GetSection(nameof(AmazonBulketOptions)).Get<AmazonBulketOptions>();
         ArgumentNullException.ThrowIfNull(amazonBulket);
         services.AddSingleton(amazonBulket);
+
+        var googleOptions = configuration.GetSection(nameof(GoogleCloudOptions)).Get<GoogleCloudOptions>();
+        ArgumentNullException.ThrowIfNull(googleOptions);
+        services.AddSingleton(googleOptions);
 
         var jwtOptions = configuration.GetSection(nameof(JwtOptions)).Get<JwtOptions>();
         ArgumentNullException.ThrowIfNull(jwtOptions);

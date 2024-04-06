@@ -20,7 +20,7 @@ namespace IMGCloud.Infrastructure.Services
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IStringLocalizer<UserService> _stringLocalizer;
         private readonly IAmazonBucketService _amazonBucketService;
-
+        private readonly IGoogleCloudService _googleCloudService;
         public string? GetCurrentUserName
         {
             get
@@ -40,7 +40,8 @@ namespace IMGCloud.Infrastructure.Services
             IUserTokenRepository userTokenRepository,
             IUserDetailRepository userDetailRepository,
             IHttpContextAccessor httpContextAccessor,
-            IAmazonBucketService amazonBucketService)
+            IAmazonBucketService amazonBucketService,
+            IGoogleCloudService googleCloudService)
         {
             _logger = logger;
             _userRepository = userRepository;
@@ -49,6 +50,7 @@ namespace IMGCloud.Infrastructure.Services
             _httpContextAccessor = httpContextAccessor;
             _stringLocalizer = stringLocalizer;
             _amazonBucketService = amazonBucketService;
+            _googleCloudService = googleCloudService;
         }
 
         private async Task CreateUserAsync(CreateUserRequest model, CancellationToken cancellationToken)
@@ -75,7 +77,7 @@ namespace IMGCloud.Infrastructure.Services
         private async Task CreateUserDetailAsync(UserDetailsRequest userInfo, CancellationToken cancellationToken = default)
         {
 
-            var photoUrl = await _amazonBucketService.UploadFileAsync(userInfo.Photo, false, cancellationToken);
+            var photoUrl = await _googleCloudService.UploadFileAsync(userInfo.Photo, cancellationToken);
             userInfo.Photo = photoUrl;
 
             await _userRepository.CreateUserDetailAsync(userInfo, cancellationToken);

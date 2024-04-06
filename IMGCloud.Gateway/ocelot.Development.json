@@ -1,187 +1,151 @@
 {
   "Routes": [
     {
-      "DownstreamPathTemplate": "/api/v1/auth/sigin-async",
-      "UpstreamPathTemplate": "/identity-service/api/sigin-async",
-      "UpstreamHttpMethod": [ "POST" ],
-      "DownstreamScheme": "https",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "192.168.0.193",
-          "Port": 8000
-        }
-      ]
-    },
-    {
-      "DownstreamPathTemplate": "/api/v1/auth/register-async",
-      "UpstreamPathTemplate": "/identity-service/api/register-async",
-      "UpstreamHttpMethod": [ "POST" ],
-      "DownstreamScheme": "https",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "192.168.0.193",
-          "Port": 8000
-        }
-      ]
-    },
-    {
-      "DownstreamPathTemplate": "/api/v1/auth/sigout-async",
-      "UpstreamPathTemplate": "/identity-service/api/sigout-async",
-      "UpstreamHttpMethod": [ "POST" ],
+      "DownstreamPathTemplate": "/api/Auth/login",
+      "UpstreamPathTemplate": "/signin",
+      "UpstreamHttpMethod": [ "POST", "OPTIONS" ],
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 7202
-        }
-      ]
-    },
-    {
-      "DownstreamPathTemplate": "/api/v1/auth-external/sigin-external",
-      "UpstreamPathTemplate": "/identity-service/api/sigin-with-google",
-      "UpstreamHttpMethod": [ "POST" ],
-      "DownstreamScheme": "https",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "192.168.0.193",
           "Port": 8000
         }
       ]
     },
     {
-      "DownstreamPathTemplate": "/api/v1/test/authorize",
-      "UpstreamPathTemplate": "/identity-service/api/authorize",
+      "DownstreamPathTemplate": "/api/Auth/register",
+      "UpstreamPathTemplate": "/register",
+      "UpstreamHttpMethod": [ "POST", "OPTIONS" ],
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 8000
+        }
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/Auth/google-signin",
+      "UpstreamPathTemplate": "/google-signin",
+      "UpstreamHttpMethod": [ "POST", "OPTIONS" ],
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 8000
+        }
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/Posts/all-collections",
+      "UpstreamPathTemplate": "/all-collections",
       "UpstreamHttpMethod": [ "GET" ],
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "192.168.0.193",
+          "Host": "localhost",
           "Port": 8000
         }
       ]
     },
     {
-      "DownstreamPathTemplate": "/api/v1/redis/get-redis-by-key/{everything}",
-      "UpstreamPathTemplate": "/redis-service/api/get-redis-by-key/{everything}",
+      "DownstreamPathTemplate": "/api/Posts/all-posts",
+      "UpstreamPathTemplate": "/all-posts",
       "UpstreamHttpMethod": [ "GET" ],
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "192.168.0.193",
+          "Host": "localhost",
           "Port": 8000
         }
       ]
     },
     {
-      "DownstreamPathTemplate": "/api/v1/roles/get-all-roles-async",
-      "UpstreamPathTemplate": "/identity-service/api/get-all-roles-async",
+      "DownstreamPathTemplate": "/api/Posts/{id}",
+      "UpstreamPathTemplate": "/post/{id}",
       "UpstreamHttpMethod": [ "GET" ],
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "192.168.0.193",
+          "Host": "localhost",
           "Port": 8000
         }
       ]
     },
     {
-      "DownstreamPathTemplate": "/api/v1/roles/get-roles-by-id-async/{everything}",
-      "UpstreamPathTemplate": "/identity-service/api/get-roles-by-id-async/{everything}",
+      "DownstreamPathTemplate": "/api/Posts/{collection-id}",
+      "UpstreamPathTemplate": "/post/{collection-id}",
       "UpstreamHttpMethod": [ "GET" ],
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "192.168.0.193",
+          "Host": "localhost",
           "Port": 8000
         }
       ]
     },
     {
-      "DownstreamPathTemplate": "/api/v1/roles/get-roles-with-paging-async/{everything}",
-      "UpstreamPathTemplate": "/identity-service/api/get-roles-with-paging-async/{everything}",
-      "UpstreamHttpMethod": [ "GET" ],
+      "DownstreamPathTemplate": "/api/Posts/create",
+      "UpstreamPathTemplate": "/post/create",
+      "UpstreamHttpMethod": [ "POST", "OPTIONS" ],
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "192.168.0.193",
+          "Host": "localhost",
           "Port": 8000
         }
       ]
     },
     {
-      "DownstreamPathTemplate": "/api/v1/roles/create-async",
-      "UpstreamPathTemplate": "/identity-service/api/create-async",
-      "UpstreamHttpMethod": [ "POST" ],
+      "DownstreamPathTemplate": "/api/Users/create",
+      "UpstreamPathTemplate": "/user/create",
+      "UpstreamHttpMethod": [ "POST", "OPTIONS" ],
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "192.168.0.193",
+          "Host": "localhost",
           "Port": 8000
         }
       ]
     },
     {
-      "DownstreamPathTemplate": "/api/v1/roles/update-async",
-      "UpstreamPathTemplate": "/identity-service/api/update-async",
-      "UpstreamHttpMethod": [ "PUT", "OPTIONS" ],
+      "DownstreamPathTemplate": "/api/Users/{everything}",
+      "UpstreamPathTemplate": "/user/{everything}",
+      "UpstreamHttpMethod": [ "GET", "OPTIONS" ],
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "192.168.0.193",
+          "Host": "localhost",
           "Port": 8000
         }
       ]
     },
     {
-      "DownstreamPathTemplate": "/api/v1/roles/delete-async/{everything}",
-      "UpstreamPathTemplate": "/identity-service/api/delete-async/{everything}",
-      "UpstreamHttpMethod": [ "DELETE", "OPTIONS" ],
+      "DownstreamPathTemplate": "/api/Users/forgot-password",
+      "UpstreamPathTemplate": "/forgot-password",
+      "UpstreamHttpMethod": [ "POST", "OPTIONS" ],
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "192.168.0.193",
+          "Host": "localhost",
           "Port": 8000
         }
       ]
     },
     {
-      "DownstreamPathTemplate": "/api/v1/redis/get-redis-all",
-      "UpstreamPathTemplate": "/redis-service/api/get-redis-all",
-      "UpstreamHttpMethod": [ "GET" ],
+      "DownstreamPathTemplate": "/api/Users/reset-password",
+      "UpstreamPathTemplate": "/reset-password",
+      "UpstreamHttpMethod": [ "POST", "OPTIONS" ],
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "192.168.0.193",
-          "Port": 8000
-        }
-      ]
-    },
-    {
-      "DownstreamPathTemplate": "/api/v1/redis/set-redis-cache",
-      "UpstreamPathTemplate": "/redis-service/api/set-redis-cache",
-      "UpstreamHttpMethod": [ "POST" ],
-      "DownstreamScheme": "https",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "192.168.0.193",
-          "Port": 8000
-        }
-      ]
-    },
-    {
-      "DownstreamPathTemplate": "/api/v1/redis/clear-redis-cache-by-cache",
-      "UpstreamPathTemplate": "/redis-service/api/clear-redis-cache-by-cache",
-      "UpstreamHttpMethod": [ "POST" ],
-      "DownstreamScheme": "https",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "192.168.0.193",
+          "Host": "localhost",
           "Port": 8000
         }
       ]
     }
   ],
   "GlobalConfiguration": {
-    "BaseUrl": "192.168.0.193:9000"
+    "BaseUrl": "https://localhost:9000"
   }
 }
