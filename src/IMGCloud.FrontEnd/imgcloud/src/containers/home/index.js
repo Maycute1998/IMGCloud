@@ -5,6 +5,8 @@ import SpeedDialAction from '@mui/material/SpeedDialAction';
 import SpeedDialIcon from '@mui/material/SpeedDialIcon';
 import React from "react";
 import Collection from '../collection';
+import FirstIntro from '../intro/first-intro';
+import SearchIntro from '../intro/search-intro';
 import Post from "../post";
 import CreatePost from "../post/create-post";
 import "./home.scss";
@@ -15,7 +17,9 @@ const Home = () => {
   const [isPost, setIsPost] = React.useState(false);
   return (
     <div>
+      <FirstIntro/>
       <Collection/>
+      <SearchIntro/>
       {isPost ? <CreatePost /> : <Post />}
       <SpeedDial
         ariaLabel="SpeedDial basic example"
